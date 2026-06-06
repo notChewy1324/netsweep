@@ -1,0 +1,65 @@
+# ============================================================
+#  NetSweep monorepo .gitignore
+#  Covers the Xcode app (app/) and the static website (site/)
+# ============================================================
+
+# ---------- macOS ----------
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+
+# ---------- Xcode: user state & build output ----------
+# These are machine-specific or generated; never commit them.
+**/xcuserdata/
+**/*.xcuserstate
+**/DerivedData/
+**/build/
+*.moved-aside
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivev3
+!default.perspectivev3
+
+# Xcode workspace user settings (keep shared schemes, ignore per-user)
+**/xcshareddata/WorkspaceSettings.xcsettings
+**/project.xcworkspace/xcuserdata/
+
+# Swift Package Manager
+.build/
+.swiftpm/
+Package.resolved
+
+# ---------- Signing & secrets (NEVER commit) ----------
+*.p12
+*.cer
+*.certSigningRequest
+*.mobileprovision
+*.provisionprofile
+*.entitlements.local
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/**/*.png
+fastlane/test_output
+
+# ---------- App-specific ----------
+# Generated icon working file lives outside the repo; the committed icon
+# is the PNG already in the asset catalog.
+
+# ---------- Web tooling (in case you add a build step later) ----------
+site/node_modules/
+site/.cache/
+site/dist/
+npm-debug.log*
+yarn-error.log*
+
+# ---------- Editors ----------
+.vscode/
+.idea/
+*.swp
+*~
