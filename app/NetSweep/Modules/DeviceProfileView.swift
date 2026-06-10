@@ -114,6 +114,7 @@ struct DeviceProfileView: View {
                             if let keyword = RiskAdvisor.nvdKeyword(fromBanner: banner) {
                                 NavigationLink {
                                     CVELookupView(keyword: keyword)
+                                        .zoomDestination("cve-\(keyword)")
                                 } label: {
                                     HStack(spacing: 4) {
                                         Image(systemName: "ladybug").font(.system(.caption2))
@@ -125,6 +126,7 @@ struct DeviceProfileView: View {
                                     .foregroundStyle(Theme.danger)
                                     .padding(.leading, 56)
                                 }
+                                .zoomSource("cve-\(keyword)")
                             }
                         }
                     }

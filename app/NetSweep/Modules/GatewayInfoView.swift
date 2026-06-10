@@ -7,8 +7,10 @@ import SwiftUI
 struct GatewayInfoView: View {
     @StateObject private var path = PathMonitor()
     @StateObject private var lookup = PublicEndpointLookup()
+    @StateObject private var gwScanner = DeepScanner()
     @State private var interfaces: [InterfaceInfo] = []
     @State private var radio: RadioInfo?
+    @State private var gwScanStarted = false
 
     private var primary: InterfaceInfo? {
         interfaces.first { $0.isWiFi && $0.ipv4 != nil }
@@ -43,7 +45,15 @@ struct GatewayInfoView: View {
             path.start(); interfaces = NetInfo.interfaces(); radio = Cellular.current()
             if lookup.endpoint == nil { lookup.fetch() }
         }
-        .onDisappear { path.stop() }
+        // Kick off the auto-fingerprint as soon as we know the gateway IP. On
+        // cellular `gateway` stays nil (there's no LAN router to probe), so this
+        // simply never fires.
+        .onChange(of: gateway, initial: true) { _, new in
+            guard !gwScanStarted, let gw = new else { return }
+            gwScanStarted = true
+            gwScanner.scan(ip: gw, hostname: "Gateway", quick: true)
+        }
+        .onDisappear { path.stop(); gwScanner.cancel() }
     }
 
     // MARK: Cellular mode
@@ -141,6 +151,8 @@ struct GatewayInfoView: View {
                     }
                 }
 
+                gatewayFingerprintCard
+
                 Panel(title: "What The Internet Sees", accent: Theme.amber) {
                     VStack(spacing: 8) {
                         if lookup.isLoading {
@@ -157,17 +169,124 @@ struct GatewayInfoView: View {
                 if let gw = gateway {
                     NavigationLink {
                         DeviceProfileView(ip: gw, hostname: "Gateway", vendorGuess: "Router")
+                            .zoomDestination("gw-\(gw)")
                     } label: {
                         Panel(accent: Theme.accent) {
                             HStack {
                                 Image(systemName: "magnifyingglass").foregroundStyle(Theme.accent)
-                                Text("Deep scan the gateway").font(.subheadline.weight(.semibold))
+                                Text("Full scan · every common port").font(.subheadline.weight(.semibold))
                                     .foregroundStyle(Theme.textPrimary)
                                 Spacer()
                                 Image(systemName: "chevron.right").foregroundStyle(Theme.textDim)
                             }
                         }
                     }
+                    .zoomSource("gw-\(gw)")
                 }
+    }
+
+    // MARK: Auto-fingerprint card
+    // Runs a quick deep-scan on the gateway IP as soon as we know it, then
+    // shows the inferred device type, OS, vendor, and open ports with banners
+    // — all in-place, no drill-in required. Tapping the "Full scan" button
+    // still pushes the rich DeviceProfileView for everything we couldn't fit.
+
+    @ViewBuilder
+    private var gatewayFingerprintCard: some View {
+        Panel(title: "Gateway Fingerprint", accent: Theme.info) {
+            VStack(alignment: .leading, spacing: 10) {
+                if gwScanner.isScanning {
+                    HStack {
+                        ProgressView().controlSize(.small).tint(Theme.info)
+                        Text(gwScanner.phase.isEmpty ? "Probing…" : gwScanner.phase)
+                            .font(Theme.monoSm).foregroundStyle(Theme.textDim)
+                        Spacer()
+                    }
+                    ProgressView(value: gwScanner.progress).tint(Theme.info)
+                } else if let r = gwScanner.result {
+                    DataRow(key: "device type",
+                            value: r.deviceType ?? "Unknown",
+                            valueColor: Theme.accent)
+                    DataRow(key: "OS guess",
+                            value: r.osGuess ?? "Unknown",
+                            valueColor: Theme.info)
+                    DataRow(key: "vendor",
+                            value: routerVendor(from: r) ?? "Unknown",
+                            valueColor: Theme.amber)
+                    if let rtt = r.rttMs {
+                        DataRow(key: "RTT",
+                                value: String(format: "%.0f ms", rtt),
+                                valueColor: Theme.textDim)
+                    }
+                    Divider().overlay(Theme.stroke)
+                    Text("Open ports · \(r.openPorts.count)")
+                        .font(.system(.caption, design: .monospaced).weight(.bold))
+                        .foregroundStyle(Theme.textDim)
+                    if r.openPorts.isEmpty {
+                        Text("No common ports responded. The router is probably firewalled to the LAN.")
+                            .font(.system(.footnote, design: .monospaced))
+                            .foregroundStyle(Theme.textDim)
+                    } else {
+                        VStack(spacing: 6) {
+                            ForEach(r.openPorts) { p in
+                                HStack(alignment: .top, spacing: 8) {
+                                    Text("\(p.port)")
+                                        .font(.system(.subheadline, design: .monospaced).weight(.bold))
+                                        .foregroundStyle(Theme.amber)
+                                        .frame(width: 56, alignment: .leading)
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text(p.service)
+                                            .font(Theme.monoSm).foregroundStyle(Theme.textPrimary)
+                                        if let b = p.banner {
+                                            Text(b)
+                                                .font(.system(.footnote, design: .monospaced))
+                                                .foregroundStyle(Theme.info)
+                                                .lineLimit(2)
+                                                .textSelection(.enabled)
+                                        }
+                                    }
+                                    Spacer()
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    Text("Waiting on gateway address…")
+                        .font(.system(.footnote, design: .monospaced))
+                        .foregroundStyle(Theme.textDim)
+                }
+            }
+        }
+    }
+
+    // Best-effort router brand inference from collected banners. iOS doesn't
+    // expose MAC addresses to apps, so we can't do OUI lookup — banners (SSH,
+    // HTTP Server:, FTP welcome lines) are what we have.
+    private func routerVendor(from result: DeepScanResult) -> String? {
+        let bag = result.openPorts
+            .compactMap { $0.banner?.lowercased() }
+            .joined(separator: " ")
+        guard !bag.isEmpty else { return nil }
+        let brands: [(String, String)] = [
+            ("mikrotik", "MikroTik"), ("routeros", "MikroTik"),
+            ("asuswrt", "ASUS"), ("asus", "ASUS"),
+            ("netgear", "Netgear"),
+            ("tp-link", "TP-Link"), ("tplink", "TP-Link"), ("archer", "TP-Link"),
+            ("d-link", "D-Link"), ("dlink", "D-Link"),
+            ("ubnt", "Ubiquiti"), ("ubiquiti", "Ubiquiti"), ("edgerouter", "Ubiquiti"),
+            ("openwrt", "OpenWrt"), ("dd-wrt", "DD-WRT"), ("lede", "OpenWrt"),
+            ("draytek", "DrayTek"),
+            ("huawei", "Huawei"), ("zte", "ZTE"),
+            ("linksys", "Linksys"), ("cisco", "Cisco"),
+            ("synology", "Synology"), ("qnap", "QNAP"),
+            ("eero", "eero"), ("google wifi", "Google"), ("nest wifi", "Google"),
+            ("xfinity", "Comcast/Xfinity"), ("att", "AT&T"),
+            ("verizon", "Verizon"), ("fritz", "AVM Fritz!Box"),
+            ("pfsense", "pfSense"), ("opnsense", "OPNsense")
+        ]
+        for (needle, label) in brands where bag.contains(needle) {
+            return label
+        }
+        return nil
     }
 }

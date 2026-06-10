@@ -80,7 +80,7 @@ struct ConnectionView: View {
                     Pill(text: path.status, color: path.status == "ONLINE" ? Theme.accent : Theme.danger)
                     Pill(text: path.interfaceType, color: Theme.info)
                     if path.isExpensive { Pill(text: "Metered", color: Theme.amber) }
-                    if path.isConstrained { Pill(text: "Low-Data", color: Theme.amber) }
+                    if path.isConstrained { Pill(text: "Low Data", color: Theme.amber) }
                     Spacer()
                 }
                 if path.interfaceType == "CELLULAR", let radio {
@@ -89,7 +89,7 @@ struct ConnectionView: View {
                     if let carrier = radio.carrier {
                         DataRow(key: "carrier", value: carrier)
                     }
-                    Text("iOS doesn't expose signal strength, towers, or bands to apps — those are restricted APIs.")
+                    Text("iOS doesn't expose signal strength, towers, or bands to apps those are restricted APIs.")
                         .font(.system(.caption, design: .monospaced)).foregroundStyle(Theme.textDim)
                         .frame(maxWidth: .infinity, alignment: .leading)
                 } else if path.interfaceType == "CELLULAR" {

@@ -1,4 +1,5 @@
 import Foundation
+import SwiftUI
 
 // MARK: - Security analysis
 // Turns raw scan data (open ports per host) into human-readable security
@@ -23,7 +24,7 @@ enum SecurityAnalysis {
         3389: (.high,   "Remote Desktop exposed", "RDP is a common attack target. Restrict or VPN-gate it."),
         5900: (.medium, "VNC screen sharing exposed", "Screen sharing is reachable; verify it requires a strong password."),
         1900: (.low,    "UPnP/SSDP exposed", "UPnP can auto-open router ports; consider disabling on the router."),
-        9100: (.info,   "Network printer", "Raw printing port open — expected for a shared printer."),
+        9100: (.info,   "Network printer", "Raw printing port open, expected for a shared printer."),
         5555: (.high,   "Android ADB exposed", "Android Debug Bridge over network is a serious risk if unintended."),
         6379: (.high,   "Redis exposed", "Redis often ships with no auth. Verify it's bound/locked down."),
         27017:(.high,   "MongoDB exposed", "Unauthenticated MongoDB is a classic breach vector."),
@@ -53,7 +54,7 @@ enum SecurityAnalysis {
         }
         if out.isEmpty {
             out.append(AnalyzedFinding(severity: .info, title: "No risky services detected",
-                                       detail: "None of the scanned hosts exposed commonly-risky ports.",
+                                       detail: "None of the scanned hosts exposed commonly risky ports.",
                                        deviceIP: nil))
         }
         return out.sorted { $0.severity > $1.severity }
@@ -79,6 +80,13 @@ enum SecurityAnalysis {
         case 60..<85:  return ("FAIR", 1)
         default:       return ("AT RISK", 0)
         }
+    }
+
+    /// Canonical brand color for a health score. Use this everywhere a grade
+    /// drives a tint — keeps the dashboard, history, and trends visually
+    /// consistent (SECURE → green, FAIR → amber, AT RISK → red).
+    static func color(for score: Int) -> Color {
+        [Theme.danger, Theme.amber, Theme.good][grade(score).1]
     }
 
     static func summary(score: Int, deviceCount: Int, newCount: Int) -> String {

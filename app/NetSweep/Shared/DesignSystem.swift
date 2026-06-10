@@ -1,5 +1,6 @@
 import SwiftUI
 import UIKit
+import SafariServices
 
 // MARK: - Design System — "The Observatory"
 // A calm, deep, moody command-center aesthetic. One dark canvas, light used as
@@ -233,3 +234,87 @@ extension View {
         self.buttonStyle(PressableStyle(scale: scale))
     }
 }
+
+// MARK: - Zoom navigation
+// Threads a shared Namespace down a NavigationStack so any push can opt into
+// the iOS 18 .zoom transition — which is interactive and interruptible: the
+// user can grab the in-flight push/pop with a drag and scrub it back and
+// forth, not just trigger a fixed animation.
+//
+// Usage:
+//   At the NavigationStack root:  .zoomNavigationRoot()
+//   On the source label:          .zoomSource("some-id")
+//   On the destination root:      .zoomDestination("some-id")
+//   IDs must match between source and destination within the same stack.
+
+private struct NavZoomNamespaceKey: EnvironmentKey {
+    static let defaultValue: Namespace.ID? = nil
+}
+
+extension EnvironmentValues {
+    var navZoomNamespace: Namespace.ID? {
+        get { self[NavZoomNamespaceKey.self] }
+        set { self[NavZoomNamespaceKey.self] = newValue }
+    }
+}
+
+private struct ZoomNavigationRoot: ViewModifier {
+    @Namespace private var ns
+    func body(content: Content) -> some View {
+        content.environment(\.navZoomNamespace, ns)
+    }
+}
+
+private struct ZoomSourceModifier: ViewModifier {
+    @Environment(\.navZoomNamespace) private var ns
+    let id: String
+    func body(content: Content) -> some View {
+        if let ns {
+            content.matchedTransitionSource(id: id, in: ns)
+        } else {
+            content
+        }
+    }
+}
+
+private struct ZoomDestinationModifier: ViewModifier {
+    @Environment(\.navZoomNamespace) private var ns
+    let id: String
+    func body(content: Content) -> some View {
+        if let ns {
+            content.navigationTransition(.zoom(sourceID: id, in: ns))
+        } else {
+            content
+        }
+    }
+}
+
+extension View {
+    func zoomNavigationRoot() -> some View { modifier(ZoomNavigationRoot()) }
+    func zoomSource(_ id: String) -> some View { modifier(ZoomSourceModifier(id: id)) }
+    func zoomDestination(_ id: String) -> some View { modifier(ZoomDestinationModifier(id: id)) }
+}
+// MARK: - In-app web browser
+// SFSafariViewController wrapped for SwiftUI. Opens links inside the app —
+// the user keeps the app state, gets a "Done" button to dismiss, and Safari
+// still handles cookies/reader/sharing natively.
+
+struct SafariSheet: UIViewControllerRepresentable {
+    let url: URL
+    func makeUIViewController(context: Context) -> SFSafariViewController {
+        let cfg = SFSafariViewController.Configuration()
+        cfg.entersReaderIfAvailable = false
+        let vc = SFSafariViewController(url: url, configuration: cfg)
+        vc.preferredControlTintColor = UIColor(Theme.accent)
+        vc.dismissButtonStyle = .done
+        return vc
+    }
+    func updateUIViewController(_ vc: SFSafariViewController, context: Context) {}
+}
+
+// Small wrapper so we can drive `.sheet(item:)` from a single URL state.
+struct PresentedURL: Identifiable {
+    let url: URL
+    var id: String { url.absoluteString }
+}
+

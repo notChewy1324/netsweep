@@ -67,7 +67,7 @@
 		<string>_time-machine._tcp</string>
 	</array>
 	<key>NSLocalNetworkUsageDescription</key>
-	<string>NetSweep scans your local network to map devices, open ports, and advertised services for security auditing.</string>
+	<string>NetSweep is a personal diagnostic tool for the network you are connected to. It needs Local Network access to list the devices on your own Wi-Fi, identify the services they advertise, and help you understand and troubleshoot your own home network. NetSweep cannot target devices on any other network.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

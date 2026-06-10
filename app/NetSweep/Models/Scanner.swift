@@ -137,6 +137,7 @@ final class PortScanner: ObservableObject {
     @Published var open: [PortResult] = []
     @Published var progress: Double = 0
     @Published var isScanning = false
+    @Published var scopeError: String?
 
     struct PortResult: Identifiable {
         let id = UUID()
@@ -153,6 +154,19 @@ final class PortScanner: ObservableObject {
         cancel()
         open = []
         progress = 0
+        scopeError = nil
+
+        // Hard limit: only local-network targets are allowed. This is
+        // enforced in the scanner itself (not just the UI) so the rule
+        // can't be bypassed by future callers.
+        do {
+            try LocalNetworkGuard.ensureLocal(host)
+        } catch {
+            scopeError = error.localizedDescription
+            isScanning = false
+            return
+        }
+
         isScanning = true
         var done = 0
         let total = ports.count

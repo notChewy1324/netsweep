@@ -59,6 +59,7 @@ struct BonjourDetailView: View {
                     if let ip = r.addresses.first ?? r.host {
                         NavigationLink {
                             DeviceProfileView(ip: ip, hostname: r.host, vendorGuess: service.friendly)
+                                .zoomDestination("device-\(ip)")
                         } label: {
                             Panel(accent: Theme.accent) {
                                 HStack {
@@ -71,6 +72,7 @@ struct BonjourDetailView: View {
                                 }
                             }
                         }
+                        .zoomSource("device-\(ip)")
                     }
                 }
             }

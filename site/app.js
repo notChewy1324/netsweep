@@ -58,6 +58,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // Highlight current nav link
   const path = location.pathname.split('/').pop() || 'index.html';
   document.querySelectorAll('.nav-links a').forEach(a => {
-    if (a.getAttribute('href') === path) a.style.color = 'var(--text)';
+    if (a.getAttribute('href') === path) a.classList.add('active');
   });
 });

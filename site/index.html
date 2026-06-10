@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NetSweep — See your network like an observatory</title>
-<meta name="description" content="NetSweep is an on-device iOS network scanner with a spatial map of your devices, open-port and vulnerability insights, and a calm command-center interface. Built for IT pros, developers, and the curious.">
+<title>NetSweep — Personal Wi-Fi Diagnostics for iPhone</title>
+<meta name="description" content="NetSweep is a personal Wi-Fi diagnostic for iPhone. See every device on your own home network on a living spatial map, check the services they run, read plain-language security notes, and keep your connection healthy — all on-device, your network only.">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -12,19 +12,11 @@
 <nav>
   <div class="nav-inner">
     <a href="index.html" class="brand">
-      <svg class="mark" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <linearGradient id="swp" x1="50" y1="50" x2="86" y2="22" gradientUnits="userSpaceOnUse">
-            <stop offset="0" stop-color="#5cd9db" stop-opacity="0.85"/>
-            <stop offset="1" stop-color="#5cd9db" stop-opacity="0"/>
-          </linearGradient>
-        </defs>
-        <circle cx="50" cy="50" r="40" stroke="#5cd9db" stroke-width="2" opacity="0.30"/>
-        <circle cx="50" cy="50" r="26" stroke="#5cd9db" stroke-width="2" opacity="0.22"/>
-        <path d="M50 50 L50 8 A42 42 0 0 1 86 30 Z" fill="url(#swp)"/>
-        <line x1="50" y1="50" x2="50" y2="8" stroke="#5cd9db" stroke-width="2.5" stroke-linecap="round"/>
-        <circle cx="50" cy="50" r="7" fill="#5cd9db"/>
-        <circle cx="50" cy="50" r="3" fill="#eafdfd"/>
+      <svg class="mark" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <circle cx="50" cy="50" r="42" stroke="var(--accent)" stroke-width="2.5" opacity="0.3"/>
+        <circle cx="50" cy="50" r="28" stroke="var(--accent)" stroke-width="2" opacity="0.18"/>
+        <path d="M14 50 H36 L43 34 L53 68 L60 50 H86" stroke="var(--accent)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle class="pulse-core" cx="86" cy="50" r="5" fill="var(--accent)"/>
       </svg>
       NetSweep
     </a>
@@ -45,84 +37,174 @@
 <!-- HERO -->
 <header class="hero wrap">
   <div class="reveal in">
-    <span class="pill dot">On-device · No accounts · No tracking</span>
+    <span class="pill dot">On-device · Your network only · No accounts</span>
   </div>
   <h1 class="reveal in" data-delay="80" style="margin-top:24px;">
-    See your network like<br><span class="gradient-text">an observatory.</span>
+    Understand the network<br><span class="gradient-text">you live on.</span>
   </h1>
   <p class="lead reveal in" data-delay="160">
-    NetSweep maps every device on your network as a living spatial canvas —
-    then surfaces open ports, risk notes, and what the internet sees. A calm
-    command center for the devices you actually own.
+    NetSweep is a personal Wi-Fi diagnostic for iPhone. It maps every device on
+    your own home network as a living canvas, explains what they're running in
+    plain language, and helps you keep your connection healthy — without a
+    laptop, a terminal, or a free afternoon.
   </p>
   <div class="hero-actions reveal in" data-delay="240">
-    <a href="use-cases.html" class="btn btn-primary">Explore use cases →</a>
+    <a href="use-cases.html" class="btn btn-primary">See how people use it →</a>
     <a href="privacy.html" class="btn btn-ghost">Privacy policy</a>
   </div>
 
-  <!-- Animated scope -->
-  <div class="scope reveal in" data-delay="320">
+  <!-- Pulse visual: a diagnostic heartbeat across your home network -->
+  <div class="pulse-viz reveal in" data-delay="320" aria-hidden="true">
     <svg viewBox="0 0 200 200">
       <circle class="ring outer" cx="100" cy="100" r="92"/>
-      <circle class="ring" cx="100" cy="100" r="64"/>
-      <circle class="ring" cx="100" cy="100" r="36"/>
-      <line class="crosshair" x1="100" y1="8" x2="100" y2="192"/>
-      <line class="crosshair" x1="8" y1="100" x2="192" y2="100"/>
-      <g class="sweep">
-        <path d="M100 100 L100 8 A92 92 0 0 1 165 35 Z" fill="url(#sweepGrad)" opacity="0.5"/>
-      </g>
-      <defs>
-        <radialGradient id="sweepGrad" cx="0%" cy="100%" r="100%">
-          <stop offset="0%" stop-color="#5cd9db" stop-opacity="0.5"/>
-          <stop offset="100%" stop-color="#5cd9db" stop-opacity="0"/>
-        </radialGradient>
-      </defs>
-      <circle class="blip" cx="140" cy="62" r="4"/>
-      <circle class="blip b2" cx="64" cy="140" r="4"/>
-      <circle class="blip b3" cx="150" cy="130" r="4"/>
-      <circle class="core" cx="100" cy="100" r="9"/>
+      <circle class="ring" cx="100" cy="100" r="62"/>
+      <circle class="ring" cx="100" cy="100" r="32"/>
+      <line class="spoke" x1="100" y1="8" x2="100" y2="192"/>
+      <line class="spoke" x1="8" y1="100" x2="192" y2="100"/>
+      <line class="spoke" x1="35" y1="35" x2="165" y2="165"/>
+      <line class="spoke" x1="165" y1="35" x2="35" y2="165"/>
+      <circle class="wave" cx="100" cy="100" r="92"/>
+      <circle class="wave w2" cx="100" cy="100" r="92"/>
+      <circle class="wave w3" cx="100" cy="100" r="92"/>
+      <circle class="node"    cx="144" cy="56"  r="4"/>
+      <circle class="node n2" cx="56"  cy="144" r="4"/>
+      <circle class="node n3" cx="162" cy="100" r="4"/>
+      <circle class="node n4" cx="68"  cy="68"  r="4"/>
+      <circle class="node n5" cx="100" cy="162" r="4"/>
+      <text class="node-label" x="152" y="52">laptop</text>
+      <text class="node-label" x="30"  y="156">smart tv</text>
+      <text class="node-label" x="168" y="92">printer</text>
+      <text class="node-label" x="40"  y="62">phone</text>
+      <text class="node-label" x="108" y="170">speaker</text>
+      <text class="node-label" x="108" y="96">router</text>
+      <circle class="core" cx="100" cy="100" r="8"/>
     </svg>
   </div>
 </header>
 
-<!-- VALUE -->
+<!-- WHY -->
 <section class="wrap">
   <div class="sec-head center reveal" data-num="01 — WHY">
     <span class="eyebrow">Why NetSweep</span>
-    <h2>Network tools usually look like spreadsheets.<br>This one looks like a night sky.</h2>
-    <p class="lead" style="margin:0 auto;">Most scanners hand you a list of IP addresses. NetSweep gives you a place — a spatial map you pan and zoom, where your devices orbit a central beacon and problems glow before you read a word.</p>
+    <h2>Your Wi-Fi has a whole life<br>you've never seen.</h2>
+    <p class="lead" style="margin:0 auto;">Smart plugs, cameras, consoles, that one mystery box blinking in the corner — your home network is full of devices quietly doing things. NetSweep gives them a place: a spatial map you pan and zoom, where your router sits at the center and anything worth a look gently stands out.</p>
   </div>
 
   <div class="grid grid-3">
     <div class="card reveal" data-delay="0">
       <div class="ic">◎</div>
-      <h3>Spatial device map</h3>
-      <p>Every device is a node you can drag, tap, and zoom into. Your gateway sits at the center; new and risky devices stand out at a glance.</p>
+      <h3>A living map of home</h3>
+      <p>Every device is a node you can drag, tap, and zoom into. New arrivals stand out, familiar devices settle in, and the whole canvas breathes with your network.</p>
     </div>
     <div class="card reveal" data-delay="80">
-      <div class="ic">⚠</div>
-      <h3>Risk, in context</h3>
-      <p>Open ports and exposed services are mapped to plain-language risk notes per device — and tied back to live CVE lookups from the NIST database.</p>
+      <div class="ic">✚</div>
+      <h3>Service Diagnostics</h3>
+      <p>Check which services your own devices are running — your NAS, your printer, your Pi — with results explained in plain language, not port numbers.</p>
     </div>
     <div class="card reveal" data-delay="160">
-      <div class="ic">◐</div>
-      <h3>Living health</h3>
-      <p>The whole interface shifts mood with your network's health — calm cyan when all's well, amber when something's worth a look, red when it isn't.</p>
+      <div class="ic">✎</div>
+      <h3>Security Notes</h3>
+      <p>An informational guide, not an alarm bell. Notes draw on public NIST NVD data to explain what a service is and whether it deserves a second look on your network.</p>
     </div>
     <div class="card reveal" data-delay="0">
-      <div class="ic">⊙</div>
-      <h3>Deep device profiles</h3>
-      <p>Tap any device for a deep scan: detected services, TLS certificate inspection, banner grabs, OS guesses, and an exportable report.</p>
+      <div class="ic">⇄</div>
+      <h3>Compare scans</h3>
+      <p>See exactly what changed between two scans — devices that joined, left, or started advertising something new. Great for before-and-after router tweaks.</p>
     </div>
     <div class="card reveal" data-delay="80">
-      <div class="ic">↻</div>
-      <h3>Connection insight</h3>
-      <p>Latency, jitter, and throughput estimates with history over time, plus exactly what the public internet sees about your connection.</p>
+      <div class="ic">⌁</div>
+      <h3>Connection telemetry</h3>
+      <p>Latency, jitter, and throughput estimates with history and trends over time, plus exactly what the public internet sees about your connection.</p>
     </div>
     <div class="card reveal" data-delay="160">
       <div class="ic">⤓</div>
       <h3>Reports you can keep</h3>
-      <p>Export any scan as a clean PDF or JSON — useful for documentation, an audit trail, or just tracking your network over time.</p>
+      <p>Export any scan as a clean PDF or JSON — handy for your own records, a note to your ISP, or just tracking your network over time.</p>
+    </div>
+  </div>
+</section>
+
+<!-- TOOLKIT -->
+<section class="wrap">
+  <div class="sec-head center reveal" data-num="02 — TOOLKIT">
+    <span class="eyebrow">The toolkit</span>
+    <h2>Nine quiet instruments,<br>arranged your way.</h2>
+    <p class="lead" style="margin:0 auto;">The home canvas is a customizable layout of tools — the same nine you'll find in the app, each doing one job well.</p>
+  </div>
+
+  <div class="tools-grid">
+    <div class="tool-chip is-good reveal" data-delay="0">
+      <div class="glyph">◎</div>
+      <div><div class="t-name">Overview</div><div class="t-sub">network summary</div></div>
+    </div>
+    <div class="tool-chip is-purple reveal" data-delay="40">
+      <div class="glyph">⇄</div>
+      <div><div class="t-name">Compare</div><div class="t-sub">scan delta</div></div>
+    </div>
+    <div class="tool-chip is-teal reveal" data-delay="80">
+      <div class="glyph">❋</div>
+      <div><div class="t-name">Network Map</div><div class="t-sub">device atlas</div></div>
+    </div>
+    <div class="tool-chip is-amber reveal" data-delay="120">
+      <div class="glyph">✚</div>
+      <div><div class="t-name">Service Diagnostics</div><div class="t-sub">check your devices</div></div>
+    </div>
+    <div class="tool-chip is-info reveal" data-delay="160">
+      <div class="glyph">≋</div>
+      <div><div class="t-name">Bonjour</div><div class="t-sub">service beacons</div></div>
+    </div>
+    <div class="tool-chip is-danger reveal" data-delay="200">
+      <div class="glyph">✎</div>
+      <div><div class="t-name">Security Notes</div><div class="t-sub">informational guide</div></div>
+    </div>
+    <div class="tool-chip is-good reveal" data-delay="240">
+      <div class="glyph">⌁</div>
+      <div><div class="t-name">Connection</div><div class="t-sub">link telemetry</div></div>
+    </div>
+    <div class="tool-chip is-purple reveal" data-delay="280">
+      <div class="glyph">↺</div>
+      <div><div class="t-name">History</div><div class="t-sub">session log</div></div>
+    </div>
+    <div class="tool-chip is-info reveal" data-delay="320">
+      <div class="glyph">ƒ</div>
+      <div><div class="t-name">Net Utils</div><div class="t-sub">subnet math</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- SCOPE GUARD -->
+<section class="wrap">
+  <div class="guard reveal">
+    <span class="eyebrow">Your network only</span>
+    <h2 style="max-width:640px;">It can't look at anyone else's network. By design — and in code.</h2>
+    <p class="lead">NetSweep is a diagnostic for the network you own, and that boundary isn't a disclaimer buried in a settings page. It's enforced three ways:</p>
+
+    <div class="guard-steps">
+      <div class="guard-step reveal" data-delay="0">
+        <span class="step-num">01 / ENFORCED IN CODE</span>
+        <h3>A guard at the engine</h3>
+        <p>Every diagnostic target is validated against your own subnet on your active interface before a single connection is made. Anything outside it is refused at the engine level — no UI setting can bypass it.</p>
+      </div>
+      <div class="guard-step reveal" data-delay="80">
+        <span class="step-num">02 / YOU CONFIRM IT'S YOURS</span>
+        <h3>An honest first run</h3>
+        <p>Before the first scan, the app asks you to confirm you're the owner or authorized administrator of the network. The start button stays locked until you do.</p>
+      </div>
+      <div class="guard-step reveal" data-delay="160">
+        <span class="step-num">03 / ALWAYS VISIBLE</span>
+        <h3>Scope you can see</h3>
+        <p>Service Diagnostics shows a "Your network only" panel right above the input. Type an outside host and you get a clear explanation, not a scan.</p>
+      </div>
+    </div>
+
+    <div class="uc-visual reveal" data-delay="240" style="margin-top:22px; min-height:0;">
+      <div class="uc-tag">Service Diagnostics · target check</div>
+      <div class="mock">
+        <div class="row"><span class="k">192.168.1.42 · your NAS</span><span class="v ok">✓ in scope — on your subnet</span></div>
+        <div class="row"><span class="k">printer.local</span><span class="v ok">✓ in scope — local hostname</span></div>
+        <div class="row"><span class="k">example.com</span><span class="v bad">✕ refused — not on your network</span></div>
+        <div class="row"><span class="k">8.8.8.8</span><span class="v bad">✕ refused — public address</span></div>
+      </div>
     </div>
   </div>
 </section>
@@ -136,8 +218,8 @@
     <div class="stats">
       <div class="stat reveal"><div class="num">0</div><div class="lbl">Accounts required</div></div>
       <div class="stat reveal" data-delay="60"><div class="num">0</div><div class="lbl">Trackers or ads</div></div>
-      <div class="stat reveal" data-delay="120"><div class="num">100%</div><div class="lbl">On-device scanning</div></div>
-      <div class="stat reveal" data-delay="180"><div class="num">3</div><div class="lbl">Optional lookups, query-only</div></div>
+      <div class="stat reveal" data-delay="120"><div class="num">100%</div><div class="lbl">On-device diagnostics</div></div>
+      <div class="stat reveal" data-delay="180"><div class="num">1</div><div class="lbl">Network it works on: yours</div></div>
     </div>
   </div>
 </section>
@@ -148,7 +230,7 @@
     <div class="reveal">
       <span class="eyebrow">A portfolio piece</span>
       <h2>Designed and built by Cam Garrison.</h2>
-      <p class="lead">NetSweep is a showcase of full-stack iOS craft: a custom SwiftUI spatial canvas with UIKit-backed gesture handling, a concurrent on-device scanning engine that respects the iOS sandbox, SwiftData persistence, Swift Charts, live CVE integration, PDF generation, and accessibility from Dynamic Type to Reduce Motion.</p>
+      <p class="lead">NetSweep is a showcase of full-stack iOS craft: a custom SwiftUI spatial canvas with UIKit-backed gestures, a concurrent on-device diagnostic engine with hard local-network scope enforcement, SwiftData persistence, Swift Charts trends, scan-diff comparison, live NIST NVD integration, PDF generation, and accessibility from Dynamic Type to Reduce Motion.</p>
       <div class="hero-actions" style="justify-content:flex-start;margin-top:28px;">
         <a href="https://camgarrison.com" class="btn btn-primary">View portfolio →</a>
         <a href="https://github.com/notchewy1324" class="btn btn-ghost">GitHub</a>
@@ -158,9 +240,10 @@
       <div class="uc-tag">Engineering highlights</div>
       <div class="mock">
         <div class="row"><span class="k">Interface</span><span class="v">SwiftUI · UIKit gestures</span></div>
-        <div class="row"><span class="k">Scan engine</span><span class="v">async/await · TCP connect</span></div>
-        <div class="row"><span class="k">Persistence</span><span class="v">SwiftData</span></div>
-        <div class="row"><span class="k">Vuln data</span><span class="v">NIST NVD (live)</span></div>
+        <div class="row"><span class="k">Diagnostic engine</span><span class="v">async/await · TCP connect</span></div>
+        <div class="row"><span class="k">Scope guard</span><span class="v ok">local subnet only, model-layer</span></div>
+        <div class="row"><span class="k">Persistence</span><span class="v">SwiftData · Swift Charts</span></div>
+        <div class="row"><span class="k">Reference data</span><span class="v">NIST NVD (live)</span></div>
         <div class="row"><span class="k">Sandbox-safe</span><span class="v ok">yes — no private APIs</span></div>
         <div class="row"><span class="k">Accessibility</span><span class="v ok">Dynamic Type · Reduce Motion</span></div>
       </div>
@@ -173,21 +256,14 @@
   <div class="wrap foot-inner">
     <div>
       <a href="index.html" class="brand" style="margin-bottom:14px;">
-        <svg class="mark" viewBox="0 0 100 100" fill="none">
-          <defs>
-            <linearGradient id="swpf" x1="50" y1="50" x2="86" y2="22" gradientUnits="userSpaceOnUse">
-              <stop offset="0" stop-color="#5cd9db" stop-opacity="0.8"/>
-              <stop offset="1" stop-color="#5cd9db" stop-opacity="0"/>
-            </linearGradient>
-          </defs>
-          <circle cx="50" cy="50" r="40" stroke="#5cd9db" stroke-width="2" opacity="0.30"/>
-          <path d="M50 50 L50 8 A42 42 0 0 1 86 30 Z" fill="url(#swpf)"/>
-          <line x1="50" y1="50" x2="50" y2="8" stroke="#5cd9db" stroke-width="2.5" stroke-linecap="round"/>
-          <circle cx="50" cy="50" r="7" fill="#5cd9db"/>
+        <svg class="mark" viewBox="0 0 100 100" fill="none" aria-hidden="true">
+          <circle cx="50" cy="50" r="42" stroke="var(--accent)" stroke-width="2.5" opacity="0.3"/>
+          <path d="M14 50 H36 L43 34 L53 68 L60 50 H86" stroke="var(--accent)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="86" cy="50" r="5" fill="var(--accent)"/>
         </svg>
         NetSweep
       </a>
-      <p style="max-width:280px;font-size:0.9rem;">An on-device network observatory for the devices you own.</p>
+      <p style="max-width:280px;font-size:0.9rem;">Personal Wi-Fi diagnostics for the network you own.</p>
     </div>
     <div class="foot-links">
       <div class="foot-col">
@@ -205,7 +281,7 @@
   </div>
   <div class="wrap foot-bottom">
     <span>© <span id="year"></span> Cam Garrison. NetSweep.</span>
-    <span>For auditing networks you own or administer.</span>
+    <span>For your own network — by design.</span>
   </div>
 </footer>
 

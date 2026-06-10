@@ -14,7 +14,14 @@ struct CVEItem: Identifiable {
     let severity: String           // CRITICAL / HIGH / MEDIUM / LOW / UNKNOWN
     let score: Double?             // CVSS base score
     let published: String?
-    var nvdURL: URL { URL(string: "https://nvd.nist.gov/vuln/detail/\(id)")! }
+    // Percent-encode the CVE ID for the path segment so a malformed `id`
+    // can't produce nil or an unexpected URL. Falls back to the bare detail
+    // landing page in the (never-observed) case that encoding fails.
+    var nvdURL: URL {
+        let encoded = id.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? id
+        return URL(string: "https://nvd.nist.gov/vuln/detail/\(encoded)")
+            ?? URL(string: "https://nvd.nist.gov/")!
+    }
 
     var severityRank: Int {
         switch severity.uppercased() {

@@ -5,6 +5,14 @@ struct SettingsView: View {
     @EnvironmentObject var settings: AppSettings
     @Environment(\.modelContext) private var context
     @Query private var sessions: [ScanSession]
+    @State private var browserLink: PresentedURL?
+    @State private var confirmingDeleteAll = false
+
+    // Static URLs for the Developer links. Holding them as constants — rather
+    // than constructing inline with force-unwrap — means a malformed string
+    // would be a build-time concern, not a tap-time crash.
+    private static let developerSiteURL = URL(string: "https://camgarrison.com")
+    private static let appSiteURL = URL(string: "https://netsweepapp.com")
 
     var body: some View {
         NavigationStack {
@@ -43,13 +51,15 @@ struct SettingsView: View {
 
                             Toggle(isOn: $settings.notifyNewDevices) {
                                 VStack(alignment: .leading, spacing: 2) {
-                                    Text("New-device alerts")
+                                    Text("New device alerts")
                                         .font(.system(.subheadline, design: .monospaced).weight(.bold))
                                         .foregroundStyle(Theme.textPrimary)
                                     Text("Notify when an unrecognized device joins.")
                                         .font(.system(.footnote, design: .monospaced)).foregroundStyle(Theme.textDim)
                                 }
-                            }.tint(Theme.accent)
+                            }
+                            .tint(Theme.accent)
+                            .sensoryFeedback(.selection, trigger: settings.notifyNewDevices)
 
                             Divider().overlay(Theme.stroke)
 
@@ -64,7 +74,7 @@ struct SettingsView: View {
                                     Text("Background checks")
                                         .font(.system(.subheadline, design: .monospaced).weight(.bold))
                                         .foregroundStyle(Theme.textPrimary)
-                                    Text("Occasionally re-check your Wi-Fi for new devices in the background. iOS controls the timing (often hours apart, never guaranteed) — this isn't continuous monitoring.")
+                                    Text("Occasionally re-check your Wi-Fi for new devices in the background. iOS controls the timing (often hours apart, never guaranteed) this isn't continuous monitoring.")
                                         .font(.system(.footnote, design: .monospaced)).foregroundStyle(Theme.textDim)
                                 }
                             }.tint(Theme.accent)
@@ -76,7 +86,7 @@ struct SettingsView: View {
                             DataRow(key: "app", value: AppInfo.displayName)
                             DataRow(key: "version", value: "1.0")
                             DataRow(key: "scans stored", value: "\(sessions.count)")
-                            Text("\(AppInfo.displayName) is an on-device network observatory: it maps the devices on your network, surfaces open ports and risk notes, and helps you keep an eye on what's connected. Everything runs locally — no accounts, ads, or trackers. Three features make outbound requests by necessity: the public-IP lookup (ipwho.is), the speed estimate (Cloudflare), and CVE lookup (NIST NVD), which send only the query, never your scan data.")
+                            Text("\(AppInfo.displayName) is a personal diagnostic tool for the Wi-Fi network you are connected to. It lists the devices on your own network, identifies the services they advertise, and offers informational notes to help you understand and troubleshoot your own gear. It only works on the network you're currently connected to and cannot target devices on any other network. Everything runs on-device — no accounts, ads, or trackers. Three features make outbound requests by necessity: the public-IP lookup (ipwho.is), the speed estimate (Cloudflare), and CVE lookup (NIST NVD), which send only your query, never your scan data.")
                                 .font(.footnote).foregroundStyle(Theme.textDim)
                                 .frame(maxWidth: .infinity, alignment: .leading).padding(.top, 4)
                         }
@@ -86,40 +96,53 @@ struct SettingsView: View {
                         VStack(alignment: .leading, spacing: 10) {
                             Text("Designed & built by Cam Garrison")
                                 .font(.subheadline.weight(.medium)).foregroundStyle(Theme.textPrimary)
-                            Link(destination: URL(string: "https://camgarrison.com")!) {
-                                HStack(spacing: 8) {
-                                    Image(systemName: "globe").foregroundStyle(Theme.accent)
-                                    Text("camgarrison.com").foregroundStyle(Theme.accent)
-                                    Spacer()
-                                    Image(systemName: "arrow.up.right").font(.caption).foregroundStyle(Theme.textDim)
+                            if let url = Self.developerSiteURL {
+                                Button {
+                                    Haptics.tap()
+                                    browserLink = PresentedURL(url: url)
+                                } label: {
+                                    HStack(spacing: 8) {
+                                        Image(systemName: "globe").foregroundStyle(Theme.accent)
+                                        Text("camgarrison.com").foregroundStyle(Theme.accent)
+                                        Spacer()
+                                        Image(systemName: "arrow.up.right").font(.caption).foregroundStyle(Theme.textDim)
+                                    }
                                 }
+                                .buttonStyle(.plain)
                             }
-                            .simultaneousGesture(TapGesture().onEnded { Haptics.tap() })
-                            Link(destination: URL(string: "https://github.com/notchewy1324")!) {
-                                HStack(spacing: 8) {
-                                    Image(systemName: "chevron.left.forwardslash.chevron.right")
-                                        .foregroundStyle(Theme.accent)
-                                    Text("github.com/notchewy1324").foregroundStyle(Theme.accent)
-                                    Spacer()
-                                    Image(systemName: "arrow.up.right").font(.caption).foregroundStyle(Theme.textDim)
+                            if let url = Self.appSiteURL {
+                                Button {
+                                    Haptics.tap()
+                                    browserLink = PresentedURL(url: url)
+                                } label: {
+                                    HStack(spacing: 8) {
+                                        Image(systemName: "app.badge").foregroundStyle(Theme.accent)
+                                        Text("netsweepapp.com").foregroundStyle(Theme.accent)
+                                        Spacer()
+                                        Image(systemName: "arrow.up.right").font(.caption).foregroundStyle(Theme.textDim)
+                                    }
                                 }
+                                .buttonStyle(.plain)
                             }
-                            .simultaneousGesture(TapGesture().onEnded { Haptics.tap() })
                         }
                         .font(.subheadline)
                     }
 
                     Panel(title: "Responsible Use", accent: Theme.amber) {
-                        Text("Only scan networks and devices you own or have explicit authorization to test. Unauthorized scanning may violate law and acceptable-use policies.")
-                            .font(.system(.footnote, design: .monospaced)).foregroundStyle(Theme.textDim)
+                        VStack(alignment: .leading, spacing: 10) {
+                            Text("\(AppInfo.displayName) is built for the person who owns or administers a network — it only operates on the Wi-Fi you're currently connected to. Diagnostic tools refuse any target that isn't on that network.")
+                                .font(.system(.footnote, design: .monospaced)).foregroundStyle(Theme.textDim)
+                            Text("Using \(AppInfo.displayName) on a network you do not own or are not authorized to administer may violate local law and the network's acceptable-use policy.")
+                                .font(.system(.footnote, design: .monospaced)).foregroundStyle(Theme.textDim)
+                        }
                     }
 
                     if !sessions.isEmpty {
                         Panel(title: "Data", accent: Theme.danger) {
                             ActionButton(title: "Delete All Scan History",
                                          systemImage: "trash", color: Theme.danger) {
-                                for s in sessions { context.delete(s) }
-                                try? context.save()
+                                Haptics.tap()
+                                confirmingDeleteAll = true
                             }
                         }
                     }
@@ -130,6 +153,26 @@ struct SettingsView: View {
             .background(ObservatoryCanvas())
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
+            .sheet(item: $browserLink) { link in
+                SafariSheet(url: link.url).ignoresSafeArea()
+            }
+            .confirmationDialog("Delete all scan history?",
+                                isPresented: $confirmingDeleteAll,
+                                titleVisibility: .visible) {
+                Button("Delete \(sessions.count) Scan\(sessions.count == 1 ? "" : "s")", role: .destructive) {
+                    deleteAllSessions()
+                }
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                Text("This permanently removes every saved scan from this device.")
+            }
         }
+        .zoomNavigationRoot()
+    }
+
+    private func deleteAllSessions() {
+        for s in sessions { context.delete(s) }
+        try? context.save()
+        Haptics.success()
     }
 }

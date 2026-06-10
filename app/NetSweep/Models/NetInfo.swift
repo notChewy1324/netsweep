@@ -120,6 +120,103 @@ enum NetInfo {
         let network = ipInt & maskInt
         return uint32ToIP(network + 1)
     }
+
+    /// True if `candidate` is within an RFC1918 / link-local / shared-address
+    /// private range. Used as a safety net for non-routed scanning targets.
+    static func isPrivateIPv4(_ candidate: String) -> Bool {
+        guard let ip = ipToUInt32(candidate) else { return false }
+        // 10.0.0.0/8
+        if (ip & 0xFF000000) == 0x0A000000 { return true }
+        // 172.16.0.0/12
+        if (ip & 0xFFF00000) == 0xAC100000 { return true }
+        // 192.168.0.0/16
+        if (ip & 0xFFFF0000) == 0xC0A80000 { return true }
+        // 100.64.0.0/10 (carrier-grade NAT / shared)
+        if (ip & 0xFFC00000) == 0x64400000 { return true }
+        // 169.254.0.0/16 (link-local)
+        if (ip & 0xFFFF0000) == 0xA9FE0000 { return true }
+        // 127.0.0.0/8 (loopback)
+        if (ip & 0xFF000000) == 0x7F000000 { return true }
+        return false
+    }
+
+    /// True if `candidate` sits inside the local subnet for the given
+    /// interface IP + netmask.
+    static func isOnLocalSubnet(_ candidate: String, ip: String, netmask: String) -> Bool {
+        guard let c = ipToUInt32(candidate),
+              let i = ipToUInt32(ip),
+              let m = ipToUInt32(netmask) else { return false }
+        return (c & m) == (i & m)
+    }
+}
+
+// MARK: - Local-network scope guard
+// Ensures that probing tools only ever target devices on the user's own
+// local network. Centralized so every tool applies the same rule.
+
+enum LocalNetworkGuard {
+
+    enum ScopeError: LocalizedError {
+        case noInterface
+        case notLocal(host: String)
+
+        var errorDescription: String? {
+            switch self {
+            case .noInterface:
+                return "Connect to Wi-Fi to use this tool. NetSweep only runs on the local network you're connected to."
+            case .notLocal(let host):
+                return "\"\(host)\" isn't on your local network. NetSweep is limited to devices on the Wi-Fi network you're connected to — public hosts can't be targeted."
+            }
+        }
+    }
+
+    /// Returns the active local IPv4 / netmask, preferring Wi-Fi.
+    static func localInterface() -> (ip: String, netmask: String)? {
+        let ifaces = NetInfo.interfaces()
+        let chosen = ifaces.first(where: { $0.isWiFi && $0.ipv4 != nil })
+            ?? ifaces.first(where: { $0.ipv4 != nil && !$0.isCellular })
+            ?? ifaces.first(where: { $0.ipv4 != nil })
+        guard let iface = chosen, let ip = iface.ipv4 else { return nil }
+        return (ip, iface.netmask ?? "255.255.255.0")
+    }
+
+    /// True if `target` is a literal IPv4 address inside the user's current
+    /// local subnet, or an unqualified ".local"/bare hostname (mDNS-style)
+    /// that can only resolve on the LAN.
+    static func isLocalTarget(_ target: String) -> Bool {
+        let trimmed = target.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return false }
+        // Numeric IP path: must sit inside our own subnet.
+        if NetInfo.ipToUInt32(trimmed) != nil {
+            guard let iface = localInterface() else { return false }
+            // Belt-and-braces: also reject anything that isn't private.
+            guard NetInfo.isPrivateIPv4(trimmed) else { return false }
+            return NetInfo.isOnLocalSubnet(trimmed, ip: iface.ip, netmask: iface.netmask)
+        }
+        // Hostname path: only mDNS / unqualified names. A ".local" suffix
+        // is the standard Bonjour TLD. A bare single-label hostname
+        // (no dots) is also resolved on the LAN. Anything else (e.g.
+        // example.com, 8.8.8.8.nip.io) is rejected.
+        let lower = trimmed.lowercased()
+        if lower.hasSuffix(".local") { return true }
+        if !lower.contains(".") {
+            // Reject anything that looks like a public hostname or
+            // contains characters outside RFC 1123 hostname syntax.
+            let ok = lower.unicodeScalars.allSatisfy {
+                ("a"..."z").contains(Character($0)) ||
+                ("0"..."9").contains(Character($0)) ||
+                $0 == "-"
+            }
+            return ok
+        }
+        return false
+    }
+
+    /// Throws if `target` falls outside the local network.
+    static func ensureLocal(_ target: String) throws {
+        guard localInterface() != nil else { throw ScopeError.noInterface }
+        guard isLocalTarget(target) else { throw ScopeError.notLocal(host: target) }
+    }
 }
 
 // MARK: - Live path monitor (WiFi vs Cellular vs none, expensive/constrained flags)

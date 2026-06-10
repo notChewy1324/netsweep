@@ -1,6 +1,14 @@
 import SwiftUI
 import SwiftData
 
+// MARK: - Security Notes
+// Read-only informational view of public CVE data from NIST's NVD,
+// matched against services already discovered on the user's own home
+// network. Intended to help a non-expert homeowner understand what an
+// open port on their own gear *might* mean and what to ask their device
+// vendor about. No exploit details, no offensive tooling — every link
+// goes to the public NVD page.
+
 struct VulnInsightsView: View {
     @StateObject private var nvd = NVDClient()
     @State private var query = ""
@@ -48,13 +56,13 @@ struct VulnInsightsView: View {
             .readableWidth()
         }
         .background(ObservatoryCanvas())
-        .navigationTitle("Vulnerability Insights")
+        .navigationTitle("Security Notes")
         .navigationBarTitleDisplayMode(.inline)
     }
 
     private var emptyState: some View {
         Panel {
-            Text("Run a network scan first. Vulnerability Insights then analyzes the open ports found on your devices and flags what's worth checking.")
+            Text("Run a scan of your own Wi-Fi first. Security Notes then looks at services discovered on your devices and surfaces general guidance and public CVE references for the homeowner to follow up on.")
                 .font(.subheadline).foregroundStyle(Theme.textDim)
         }
     }
@@ -102,16 +110,16 @@ struct VulnInsightsView: View {
         Panel(accent: Theme.amber) {
             HStack(alignment: .top, spacing: 10) {
                 Image(systemName: "info.circle.fill").foregroundStyle(Theme.amber)
-                Text("CVE data comes from NIST's NVD. Matches depend on knowing a device's exact software version, which isn't always detectable — treat results as leads to verify, not a complete audit. No exploit instructions are provided.")
+                Text("Informational only. Notes are drawn from public CVE data at NIST's NVD and matched against services found on your own network. They aren't a confirmed diagnosis — use them as a starting point to ask your device's vendor about updates. No exploit instructions are provided, and only your own devices are analyzed.")
                     .font(.system(.footnote, design: .monospaced)).foregroundStyle(Theme.textDim)
             }
         }
     }
 
     private var lookupCard: some View {
-        Panel(title: "CVE Lookup", accent: Theme.danger) {
+        Panel(title: "Look Up A Product", accent: Theme.info) {
             VStack(spacing: 10) {
-                Text("Search NVD by product and version (e.g. \"OpenSSH 8.9\", \"nginx 1.18\").")
+                Text("Search the public NIST NVD catalog by product and version (e.g. \"router firmware 1.18\"). Results are read-only links to the public NVD record.")
                     .font(.system(.footnote, design: .monospaced)).foregroundStyle(Theme.textDim)
                     .frame(maxWidth: .infinity, alignment: .leading)
                 TextField("product version", text: $query)
@@ -119,7 +127,7 @@ struct VulnInsightsView: View {
                     .textInputAutocapitalization(.never).autocorrectionDisabled()
                     .padding(10).background(Theme.surfaceHi).clipShape(RoundedRectangle(cornerRadius: 12))
                 ActionButton(title: "Search NVD", systemImage: "magnifyingglass",
-                             color: Theme.danger, running: nvd.isLoading) {
+                             color: Theme.info, running: nvd.isLoading) {
                     nvd.search(keyword: query)
                 }
             }
@@ -151,9 +159,9 @@ struct VulnInsightsView: View {
     }
 
     private var guidanceCard: some View {
-        Panel(title: "Exposed Service Guidance", accent: Theme.amber) {
+        Panel(title: "What These Services Mean", accent: Theme.amber) {
             VStack(alignment: .leading, spacing: 10) {
-                Text("Based on open ports from your last scan. These are risk notes, not confirmed CVEs.")
+                Text("Plain-language notes about the open services found on your own network. Informational guidance for the homeowner — not a confirmed diagnosis.")
                     .font(.system(.footnote, design: .monospaced)).foregroundStyle(Theme.textDim)
                 ForEach(Array(guidance.enumerated()), id: \.offset) { i, g in
                     VStack(alignment: .leading, spacing: 4) {
@@ -234,7 +242,7 @@ struct CVELookupView: View {
                 Panel(accent: Theme.amber) {
                     HStack(alignment: .top, spacing: 10) {
                         Image(systemName: "info.circle.fill").foregroundStyle(Theme.amber)
-                        Text("Results from NIST NVD for the detected banner. Verify the exact version on the device before acting. No exploit details are shown.")
+                        Text("Informational lookup against NIST's public NVD for the service identifier detected on your own device. Confirm the exact version with your device's vendor before acting. No exploit details are shown.")
                             .font(.system(.footnote, design: .monospaced)).foregroundStyle(Theme.textDim)
                     }
                 }
@@ -244,7 +252,7 @@ struct CVELookupView: View {
                 } else if let err = nvd.error {
                     Panel(accent: Theme.danger) { Text(err).font(Theme.monoSm).foregroundStyle(Theme.danger) }
                 } else if nvd.results.isEmpty {
-                    Panel { Text("No CVEs returned for \"\(keyword)\". This isn't a guarantee none exist — try a more specific version.")
+                    Panel { Text("No CVEs returned for \"\(keyword)\". This isn't a guarantee none exist try a more specific version.")
                         .font(Theme.monoSm).foregroundStyle(Theme.textDim) }
                 } else {
                     Panel(title: "CVEs · \(nvd.results.count)", accent: Theme.danger) {

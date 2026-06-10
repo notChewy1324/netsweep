@@ -31,7 +31,7 @@ final class PublicEndpointLookup: ObservableObject {
     func fetch() {
         isLoading = true
         error = nil
-        Task {
+        Task { @MainActor in
             defer { isLoading = false }
             do {
                 let config = URLSessionConfiguration.ephemeral

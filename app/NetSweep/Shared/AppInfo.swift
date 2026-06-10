@@ -6,5 +6,5 @@ import Foundation
 
 enum AppInfo {
     static let displayName = "NetSweep"
-    static let tagline = "Network Security Scanner"
+    static let tagline = "Personal Wi-Fi Diagnostics"
 }

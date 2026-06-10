@@ -2,6 +2,11 @@ import SwiftUI
 
 struct BonjourView: View {
     @StateObject private var browser = BonjourBrowser()
+    @Environment(\.scenePhase) private var scenePhase
+    // Tracks whether the browser was running before the app left the foreground
+    // so we only auto-resume listening if the user had it on. Otherwise an
+    // idle screen would silently start scanning when the user reopens the app.
+    @State private var wasBrowsingBeforeBackground = false
 
     private var grouped: [(String, [BonjourService])] {
         Dictionary(grouping: browser.services, by: { $0.friendly })
@@ -75,6 +80,7 @@ struct BonjourView: View {
                             ForEach(services) { svc in
                                 NavigationLink {
                                     BonjourDetailView(service: svc)
+                                        .zoomDestination("svc-\(svc.id.uuidString)")
                                 } label: {
                                     HStack {
                                         Text(svc.name)
@@ -87,6 +93,7 @@ struct BonjourView: View {
                                     .padding(.vertical, 6)
                                 }
                                 .buttonStyle(.plain)
+                                .zoomSource("svc-\(svc.id.uuidString)")
                             }
                         }
                     }
@@ -99,5 +106,20 @@ struct BonjourView: View {
         .navigationBarTitleDisplayMode(.inline)
         .onAppear { browser.start() }
         .onDisappear { browser.stop() }
+        .onChange(of: scenePhase) { _, phase in
+            switch phase {
+            case .background, .inactive:
+                if browser.isBrowsing {
+                    wasBrowsingBeforeBackground = true
+                    browser.stop()
+                }
+            case .active:
+                if wasBrowsingBeforeBackground {
+                    wasBrowsingBeforeBackground = false
+                    browser.start()
+                }
+            @unknown default: break
+            }
+        }
     }
 }

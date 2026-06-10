@@ -27,14 +27,15 @@ struct PortScannerView: View {
                             .foregroundStyle(Theme.accent)
                             .padding(8).background(Theme.surface, in: Circle())
                     }
-                    Text("Port Scanner").font(.title3.weight(.semibold))
+                    Text("Service Diagnostics").font(.title3.weight(.semibold))
                         .foregroundStyle(Theme.textPrimary)
                     Spacer()
                 }
+                scopeNotice
                 if !discovered.isEmpty { devicePicker }
-                Panel(title: "Target") {
+                Panel(title: "Device On Your Network") {
                     VStack(spacing: 10) {
-                        TextField("hostname or IP", text: $target)
+                        TextField("local IP (e.g. 192.168.1.x)", text: $target)
                             .font(Theme.mono)
                             .foregroundStyle(Theme.textPrimary)
                             .textInputAutocapitalization(.never)
@@ -43,7 +44,7 @@ struct PortScannerView: View {
                             .background(Theme.surfaceHi)
                             .clipShape(RoundedRectangle(cornerRadius: 12))
 
-                        DataRow(key: "ports to scan", value: "\(ports.count) common services", valueColor: Theme.textDim)
+                        DataRow(key: "services checked", value: "\(ports.count) common ports", valueColor: Theme.textDim)
 
                         if scanner.isScanning {
                             ProgressView(value: scanner.progress).tint(Theme.amber)
@@ -51,17 +52,31 @@ struct PortScannerView: View {
                                 scanner.cancel()
                             }
                         } else {
-                            ActionButton(title: "Scan", systemImage: "target", color: Theme.amber) {
+                            ActionButton(title: "Check Services", systemImage: "stethoscope", color: Theme.amber) {
                                 let t = target.trimmingCharacters(in: .whitespaces)
                                 guard !t.isEmpty else { return }
                                 scanner.scan(host: t, ports: ports)
                             }
                         }
+
+                        if let msg = scanner.scopeError {
+                            HStack(alignment: .top, spacing: 8) {
+                                Image(systemName: "exclamationmark.triangle.fill")
+                                    .foregroundStyle(Theme.danger)
+                                Text(msg)
+                                    .font(.system(.footnote, design: .monospaced))
+                                    .foregroundStyle(Theme.danger)
+                                Spacer(minLength: 0)
+                            }
+                            .padding(10)
+                            .background(Theme.danger.opacity(0.08),
+                                        in: RoundedRectangle(cornerRadius: 10))
+                        }
                     }
                 }
 
                 if !scanner.open.isEmpty {
-                    Panel(title: "Open Ports · \(scanner.open.count)", accent: Theme.amber) {
+                    Panel(title: "Reachable Services · \(scanner.open.count)", accent: Theme.amber) {
                         VStack(spacing: 0) {
                             ForEach(scanner.open) { r in
                                 VStack(spacing: 4) {
@@ -94,7 +109,7 @@ struct PortScannerView: View {
                         }
                     }
                 } else if !scanner.isScanning && scanner.progress > 0 {
-                    Text("No open ports found in range.")
+                    Text("No reachable services found on that device.")
                         .font(Theme.monoSm).foregroundStyle(Theme.textDim)
                         .frame(maxWidth: .infinity).padding(.vertical, 30)
                 }
@@ -103,24 +118,48 @@ struct PortScannerView: View {
         }
         .background(ObservatoryCanvas())
         .toolbar(.hidden, for: .navigationBar)
-        .highPriorityGesture(
-            DragGesture(minimumDistance: 20)
-                .onEnded { value in
-                    // Swipe right from the left edge to go back (replaces the
-                    // system edge-swipe we lose by hiding the nav bar).
-                    if value.startLocation.x < 60 && value.translation.width > 80
-                        && abs(value.translation.height) < 60 {
-                        Haptics.tap()
-                        dismiss()
-                    }
+        // Edge-swipe-back: attach the gesture to a narrow 16-pt strip at the
+        // leading edge instead of the whole view. Previously the gesture lived
+        // on the outer ScrollView and stole horizontal pans from the inner
+        // "Discovered Devices" picker — moving it to an edge-only overlay
+        // means inner ScrollViews never compete for the touch.
+        .overlay(alignment: .leading) {
+            Color.clear
+                .frame(width: 16)
+                .contentShape(Rectangle())
+                .highPriorityGesture(
+                    DragGesture(minimumDistance: 20)
+                        .onEnded { value in
+                            if value.translation.width > 80
+                                && abs(value.translation.height) < 60 {
+                                Haptics.tap()
+                                dismiss()
+                            }
+                        }
+                )
+                .accessibilityHidden(true)
+        }
+    }
+
+    private var scopeNotice: some View {
+        Panel(accent: Theme.info) {
+            HStack(alignment: .top, spacing: 10) {
+                Image(systemName: "house.fill").foregroundStyle(Theme.info)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Your network only")
+                        .font(.system(.subheadline, design: .monospaced).weight(.bold))
+                        .foregroundStyle(Theme.textPrimary)
+                    Text("This tool only inspects devices on the Wi-Fi network you're connected to, so you can see what services are reachable on your own gear (printers, NAS, smart-home hubs, your laptop). Public hosts on the internet can't be targeted.")
+                        .font(.system(.footnote, design: .monospaced)).foregroundStyle(Theme.textDim)
                 }
-        )
+            }
+        }
     }
 
     private var devicePicker: some View {
-        Panel(title: "Discovered Devices", accent: Theme.info) {
+        Panel(title: "Devices On Your Network", accent: Theme.info) {
             VStack(alignment: .leading, spacing: 8) {
-                Text("Tap a device from your last scan to target it.")
+                Text("Pick one of your devices from the last scan to check.")
                     .font(.system(.footnote, design: .monospaced)).foregroundStyle(Theme.textDim)
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 8) {

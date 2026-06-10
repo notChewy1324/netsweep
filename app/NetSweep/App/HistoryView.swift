@@ -4,6 +4,7 @@ import SwiftData
 struct HistoryView: View {
     @Environment(\.modelContext) private var context
     @Query(sort: \ScanSession.date, order: .reverse) private var sessions: [ScanSession]
+    @State private var confirmingClear = false
 
     var body: some View {
         NavigationStack {
@@ -13,9 +14,13 @@ struct HistoryView: View {
                         emptyState
                     } else {
                         ForEach(sessions) { s in
-                            NavigationLink { SessionDetailView(session: s) } label: {
+                            NavigationLink {
+                                SessionDetailView(session: s)
+                                    .zoomDestination("session-\(s.id)")
+                            } label: {
                                 SessionCard(session: s)
                             }
+                            .zoomSource("session-\(s.id)")
                         }
                     }
                 }
@@ -27,19 +32,41 @@ struct HistoryView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    NavigationLink { TrendsView() } label: {
+                    NavigationLink {
+                        TrendsView()
+                            .zoomDestination("trends")
+                    } label: {
                         Image(systemName: "chart.line.uptrend.xyaxis")
-                    }.tint(Theme.accent)
+                    }
+                    .tint(Theme.accent)
+                    .accessibilityLabel("Trends")
+                    .zoomSource("trends")
                 }
                 if !sessions.isEmpty {
                     ToolbarItem(placement: .topBarTrailing) {
-                        Button(role: .destructive) { clearAll() } label: {
+                        Button(role: .destructive) {
+                            Haptics.tap()
+                            confirmingClear = true
+                        } label: {
                             Image(systemName: "trash")
-                        }.tint(Theme.danger)
+                        }
+                        .tint(Theme.danger)
+                        .accessibilityLabel("Delete all history")
                     }
                 }
             }
+            .confirmationDialog("Delete all scan history?",
+                                isPresented: $confirmingClear,
+                                titleVisibility: .visible) {
+                Button("Delete \(sessions.count) Scan\(sessions.count == 1 ? "" : "s")", role: .destructive) {
+                    clearAll()
+                }
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                Text("This permanently removes every saved scan from this device.")
+            }
         }
+        .zoomNavigationRoot()
     }
 
     private var emptyState: some View {
@@ -55,13 +82,14 @@ struct HistoryView: View {
     private func clearAll() {
         for s in sessions { context.delete(s) }
         try? context.save()
+        Haptics.success()
     }
 }
 
 struct SessionCard: View {
     let session: ScanSession
     private var color: Color {
-        [Theme.danger, Theme.amber, Theme.accent][SecurityAnalysis.grade(session.healthScore).1]
+        SecurityAnalysis.color(for: session.healthScore)
     }
     var body: some View {
         Panel {
@@ -154,6 +182,7 @@ struct SessionDetailView: View {
                     Image(systemName: "square.and.arrow.up")
                 }
                 .tint(Theme.accent)
+                .accessibilityLabel("Share report")
             }
         }
     }

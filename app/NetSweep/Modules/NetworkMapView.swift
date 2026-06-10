@@ -47,10 +47,48 @@ struct NetworkMapView: View {
         let devices = session.devices.sorted {
             (NetInfo.ipToUInt32($0.ip) ?? 0) < (NetInfo.ipToUInt32($1.ip) ?? 0)
         }
+        let dense = devices.count > 20
         return Panel(title: "Topology · \(devices.count) devices") {
-            RadialMap(devices: devices, subnet: session.subnet)
-                .frame(height: devices.count > 20 ? 460 : 360)
+            if dense {
+                // For dense networks the radial layout is pushed into a
+                // larger virtual canvas (sized with the device count) and
+                // wrapped in a 2D ScrollView — the user swipes inside the
+                // card to explore nodes that fall outside the initial view.
+                // ScrollViewReader anchors the initial scroll position so
+                // the gateway hub (at the geometric center of the canvas)
+                // is centered in view when the map first appears.
+                ScrollViewReader { proxy in
+                    ScrollView([.horizontal, .vertical], showsIndicators: false) {
+                        RadialMap(devices: devices, subnet: session.subnet)
+                            .frame(width: virtualCanvasSize(devices.count),
+                                   height: virtualCanvasSize(devices.count))
+                            .id("gateway-center")
+                    }
+                    .frame(height: 500)
+                    .onAppear {
+                        proxy.scrollTo("gateway-center", anchor: .center)
+                    }
+                    .overlay(alignment: .topTrailing) {
+                        Text("swipe to explore")
+                            .font(.system(.caption2, design: .monospaced))
+                            .foregroundStyle(Theme.textDim)
+                            .padding(.horizontal, 8).padding(.vertical, 4)
+                            .background(Theme.surface.opacity(0.7), in: Capsule())
+                            .padding(8)
+                    }
+                }
+            } else {
+                RadialMap(devices: devices, subnet: session.subnet)
+                    .frame(height: 360)
+            }
         }
+    }
+
+    // 700pt baseline gives enough room for ~25 devices to breathe; beyond
+    // that we add ~22pt per device so the rings stay generously spaced even
+    // at enterprise scale (a 100-device scan ends up on a 2700pt canvas).
+    private func virtualCanvasSize(_ deviceCount: Int) -> CGFloat {
+        max(700, CGFloat(deviceCount) * 22)
     }
 
     private var auditCard: some View {
@@ -139,6 +177,7 @@ struct RadialMap: View {
                     NavigationLink {
                         DeviceProfileView(ip: device.ip, hostname: device.hostname,
                                           vendorGuess: device.vendorGuess)
+                            .zoomDestination("mapnode-\(device.ip)")
                     } label: {
                         NodeBadge(label: shortLabel(device),
                                   sub: "\(device.openPorts.count)p",
@@ -146,6 +185,7 @@ struct RadialMap: View {
                                   isHub: false, compact: compact)
                             .scaleEffect(pulse ? 1.02 : 0.99)
                     }
+                    .zoomSource("mapnode-\(device.ip)")
                     .position(p)
                 }
             }

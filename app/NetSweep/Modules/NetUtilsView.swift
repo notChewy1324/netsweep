@@ -1,5 +1,4 @@
 import SwiftUI
-import SwiftData
 
 struct NetUtilsView: View {
     @State private var tab = 0
@@ -9,7 +8,7 @@ struct NetUtilsView: View {
             VStack(spacing: 14) {
                 Picker("", selection: $tab) {
                     Text("Subnet").tag(0)
-                    Text("MAC Vendor").tag(1)
+                    Text("MAC Lookup").tag(1)
                 }.pickerStyle(.segmented)
 
                 if tab == 0 { SubnetTab() } else { MACTab() }
@@ -64,68 +63,36 @@ private struct SubnetTab: View {
 
 private struct MACTab: View {
     @State private var mac = ""
-    @State private var pickedIP: String?
-    @FocusState private var macFieldFocused: Bool
-    @Query(sort: \ScanSession.date, order: .reverse) private var sessions: [ScanSession]
 
     private var vendor: String? { MACVendor.lookup(mac) }
     private var normalized: String? { MACVendor.normalize(mac) }
-    private var devices: [DeviceRecord] {
-        guard let s = sessions.first else { return [] }
-        return s.devices.sorted { (NetInfo.ipToUInt32($0.ip) ?? 0) < (NetInfo.ipToUInt32($1.ip) ?? 0) }
-    }
 
     var body: some View {
         VStack(spacing: 14) {
-            if !devices.isEmpty {
-                Panel(title: "From Your Network", accent: Theme.info) {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Pick a discovered device, then paste its MAC from your router's client list to identify the maker.")
-                            .font(.footnote).foregroundStyle(Theme.textDim)
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(spacing: 8) {
-                                ForEach(devices) { d in
-                                    Button {
-                                        pickedIP = d.ip; Haptics.tap(); macFieldFocused = true
-                                    } label: {
-                                        VStack(spacing: 2) {
-                                            Text(d.hostname ?? d.ip.split(separator: ".").last.map(String.init) ?? d.ip)
-                                                .font(.system(.caption, design: .monospaced).weight(.bold))
-                                                .foregroundStyle(pickedIP == d.ip ? Theme.canvasTop : Theme.textPrimary)
-                                            Text(d.ip).font(.system(.caption2, design: .monospaced))
-                                                .foregroundStyle(pickedIP == d.ip ? Theme.canvasTop.opacity(0.7) : Theme.textDim)
-                                        }
-                                        .frame(width: 92).padding(.vertical, 8)
-                                        .background(pickedIP == d.ip ? Theme.info : Theme.surfaceHi,
-                                                    in: .rect(cornerRadius: 8))
-                                    }
-                                    .buttonStyle(.plain)
-                                }
-                            }
-                        }
-                        if let ip = pickedIP {
-                            DataRow(key: "selected", value: ip, valueColor: Theme.info)
-                        }
-                    }
+            Panel(title: "MAC Lookup", accent: Theme.amber) {
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("Paste a MAC address to identify the device maker. The first 24 bits — the OUI — are assigned to manufacturers by IEEE, so looking them up tells you what company made the network interface.")
+                        .font(.footnote).foregroundStyle(Theme.textDim)
+                    TextField("e.g. B8:27:EB:12:34:56", text: $mac)
+                        .font(Theme.mono).foregroundStyle(Theme.textPrimary)
+                        .textInputAutocapitalization(.never).autocorrectionDisabled()
+                        .padding(10).background(Theme.surfaceHi)
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                    Text("Tip: grab MACs from your router's client list, a Mac's System Settings → Wi-Fi → Details, or another device's network settings. iOS hides other devices' real MACs from apps for privacy, so they have to be entered by hand.")
+                        .font(.system(.caption, design: .monospaced))
+                        .foregroundStyle(Theme.textFaint)
                 }
             }
 
-            Panel(title: "MAC Address", accent: Theme.amber) {
-                VStack(spacing: 10) {
-                    TextField(pickedIP != nil ? "Paste MAC for \(pickedIP!)" : "e.g. B8:27:EB:12:34:56", text: $mac)
-                        .font(Theme.mono).foregroundStyle(Theme.textPrimary)
-                        .textInputAutocapitalization(.never).autocorrectionDisabled()
-                        .focused($macFieldFocused)
-                        .padding(10).background(Theme.surfaceHi).clipShape(RoundedRectangle(cornerRadius: 12))
-                    Text("iOS hides other devices' real MAC addresses from apps, so paste one from your router's client list (match it to the IP above) to identify its maker.")
-                        .font(.footnote).foregroundStyle(Theme.textDim)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                }
-            }
             if !mac.isEmpty {
                 Panel(title: "Lookup") {
                     VStack(spacing: 8) {
-                        if let n = normalized { DataRow(key: "normalized", value: n) }
+                        if let n = normalized {
+                            DataRow(key: "normalized", value: n, valueColor: Theme.textPrimary)
+                            DataRow(key: "OUI", value: String(n.prefix(8)), valueColor: Theme.info)
+                        } else {
+                            DataRow(key: "format", value: "invalid", valueColor: Theme.danger)
+                        }
                         DataRow(key: "vendor", value: vendor ?? "unknown / not in table",
                                 valueColor: vendor != nil ? Theme.accent : Theme.textDim)
                     }

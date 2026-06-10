@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>NetSweep — Privacy Policy</title>
-<meta name="description" content="NetSweep privacy policy. NetSweep runs entirely on your device, collects no personal data, has no accounts, ads, or trackers.">
+<meta name="description" content="NetSweep privacy policy. NetSweep is a personal Wi-Fi diagnostic that runs entirely on your device, collects no personal data, and works only on your own network. No accounts, ads, or trackers.">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -12,19 +12,11 @@
 <nav>
   <div class="nav-inner">
     <a href="index.html" class="brand">
-      <svg class="mark" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <linearGradient id="swp" x1="50" y1="50" x2="86" y2="22" gradientUnits="userSpaceOnUse">
-            <stop offset="0" stop-color="#5cd9db" stop-opacity="0.85"/>
-            <stop offset="1" stop-color="#5cd9db" stop-opacity="0"/>
-          </linearGradient>
-        </defs>
-        <circle cx="50" cy="50" r="40" stroke="#5cd9db" stroke-width="2" opacity="0.30"/>
-        <circle cx="50" cy="50" r="26" stroke="#5cd9db" stroke-width="2" opacity="0.22"/>
-        <path d="M50 50 L50 8 A42 42 0 0 1 86 30 Z" fill="url(#swp)"/>
-        <line x1="50" y1="50" x2="50" y2="8" stroke="#5cd9db" stroke-width="2.5" stroke-linecap="round"/>
-        <circle cx="50" cy="50" r="7" fill="#5cd9db"/>
-        <circle cx="50" cy="50" r="3" fill="#eafdfd"/>
+      <svg class="mark" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <circle cx="50" cy="50" r="42" stroke="var(--accent)" stroke-width="2.5" opacity="0.3"/>
+        <circle cx="50" cy="50" r="28" stroke="var(--accent)" stroke-width="2" opacity="0.18"/>
+        <path d="M14 50 H36 L43 34 L53 68 L60 50 H86" stroke="var(--accent)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle class="pulse-core" cx="86" cy="50" r="5" fill="var(--accent)"/>
       </svg>
       NetSweep
     </a>
@@ -46,10 +38,10 @@
   <div class="prose">
     <span class="eyebrow reveal in">Privacy Policy</span>
     <h1 class="reveal in" data-delay="60" style="font-size:clamp(2.2rem,5vw,3.4rem);margin:14px 0 10px;">Your network stays yours.</h1>
-    <p class="updated reveal in" data-delay="120">Last updated: <span id="updated"></span></p>
+    <p class="updated reveal in" data-delay="120">Last updated: June 10, 2026</p>
 
     <div class="callout reveal in" data-delay="160">
-      <p><strong>The short version:</strong> NetSweep runs entirely on your device. It has no accounts, no analytics, no advertising, and no trackers. Your scan results never leave your phone. A few optional features make network requests to do their job — they send only a query, never your scan data — and these are described in full below.</p>
+      <p><strong>The short version:</strong> NetSweep is a personal Wi-Fi diagnostic that runs entirely on your device and works only on your own network. It has no accounts, no analytics, no advertising, and no trackers. Your results never leave your phone. A few optional features make network requests to do their job — they send only a query, never your data — and these are described in full below.</p>
     </div>
 
     <div class="reveal">
@@ -62,49 +54,57 @@
     <h2>3. Where your data lives</h2>
     <p>Everything NetSweep produces stays on your device:</p>
     <ul>
-      <li><strong>Scan results</strong> — the devices, open ports, services, and findings from your scans are stored locally on your iPhone using Apple's on-device database (SwiftData).</li>
-      <li><strong>Settings and history</strong> — your preferences, connection-test history, and the baseline of previously-seen devices are stored locally on your device.</li>
+      <li><strong>Diagnostic results</strong> — the devices, services, and findings from looking at your own network are stored locally on your iPhone using Apple's on-device database (SwiftData).</li>
+      <li><strong>Settings and history</strong> — your preferences, connection-test history, your responsible-use acknowledgment, and the baseline of previously-seen devices are stored locally on your device.</li>
       <li>None of this is uploaded, synced to us, or shared with any third party. Deleting the app removes it.</li>
     </ul>
 
-    <h2>4. Network requests the app makes</h2>
-    <p>NetSweep is a network tool, so by design it communicates on your local network and, for a few optional features, with the public internet. These requests send only what is needed to perform the function you asked for — never your scan history or personal data.</p>
+    <h2>4. Scope of what the app examines</h2>
+    <p>NetSweep is designed for the network you are connected to and own or administer — and that limit is enforced in the app's code, not just stated here:</p>
+    <ul>
+      <li>Diagnostic targets are validated against your own local subnet on your active network interface. Addresses outside it — including any public internet address or hostname — are refused before any connection is attempted.</li>
+      <li>Before first use, the app requires you to confirm that you are the owner or authorized administrator of the network you'll be looking at.</li>
+      <li>The app's diagnostic features show this scope on-screen and explain clearly when a target is out of bounds.</li>
+    </ul>
+
+    <h2>5. Network requests the app makes</h2>
+    <p>NetSweep is a network diagnostic, so by design it communicates on your local network and, for a few optional features, with the public internet. These requests send only what is needed to perform the function you asked for — never your results, history, or personal data.</p>
 
     <h3>On your local network</h3>
-    <p>When you run a scan, NetSweep attempts standard TCP connections to devices on the network you are connected to, and listens for Bonjour/mDNS service advertisements, in order to discover and describe those devices. This activity stays within your local network.</p>
+    <p>When you run a check, NetSweep attempts standard TCP connections to devices on the network you are connected to, and listens for Bonjour/mDNS service advertisements, in order to discover and describe your devices. This activity stays within your local network.</p>
 
     <h3>Public-internet lookups (optional)</h3>
     <ul>
       <li><strong>Public IP &amp; connection info</strong> — uses <strong>ipwho.is</strong> to show the public IP address and network/ISP your connection exits from. The request reveals your public IP to that service, as any web request would.</li>
       <li><strong>Connection speed estimate</strong> — downloads a test file from <strong>Cloudflare's</strong> public speed endpoint to estimate throughput. No personal data is sent.</li>
-      <li><strong>Vulnerability (CVE) lookup</strong> — queries the <strong>NIST National Vulnerability Database</strong> with the keyword or product term you search. Only that search term is sent.</li>
+      <li><strong>Security Notes (CVE) lookup</strong> — queries the <strong>NIST National Vulnerability Database</strong> with the keyword or product term you search, for informational context about your own devices. Only that search term is sent.</li>
       <li><strong>Captive-portal check</strong> — contacts Apple's standard captive-portal address to detect networks that intercept traffic. No data about you is sent.</li>
     </ul>
-    <p>These services have their own privacy practices, which are outside our control. We do not send them your scan results, device inventory, or any identifying information beyond what an ordinary network request necessarily reveals (such as your public IP).</p>
+    <p>These services have their own privacy practices, which are outside our control. We do not send them your results, device inventory, or any identifying information beyond what an ordinary network request necessarily reveals (such as your public IP).</p>
 
-    <h2>5. Permissions the app requests</h2>
+    <h2>6. Permissions the app requests</h2>
     <ul>
-      <li><strong>Local Network</strong> — required to discover and scan devices on the network you are connected to. Without it, scanning cannot find anything.</li>
-      <li><strong>Notifications</strong> (optional) — if you enable new-device alerts or background checks, NetSweep uses local notifications to tell you when a previously-unseen device appears. These notifications are generated on your device.</li>
+      <li><strong>Local Network</strong> — required to see the devices on your own Wi-Fi and the services they advertise. Without it, the app cannot find anything. NetSweep cannot target devices on any other network.</li>
+      <li><strong>Notifications</strong> (optional) — if you enable new-device alerts or background checks, NetSweep uses local notifications to tell you when a previously-unseen device appears on your network. These notifications are generated on your device.</li>
     </ul>
 
-    <h2>6. Background activity</h2>
-    <p>If you enable background checks, NetSweep asks iOS to occasionally run a brief scan of your Wi-Fi network to detect newly-joined devices. iOS controls when (and whether) these run; they are opportunistic, not continuous. Results are compared on-device and used only to generate a local notification.</p>
+    <h2>7. Background activity</h2>
+    <p>If you enable background checks, NetSweep asks iOS to occasionally run a brief check of your Wi-Fi network to detect newly-joined devices. iOS controls when (and whether) these run; they are opportunistic, not continuous. Results are compared on-device and used only to generate a local notification.</p>
 
-    <h2>7. Children's privacy</h2>
+    <h2>8. Children's privacy</h2>
     <p>NetSweep is a networking utility intended for general audiences and is not directed at children. We do not knowingly collect any information from anyone, including children.</p>
 
-    <h2>8. Intended use</h2>
-    <p>NetSweep is designed for auditing and understanding networks that you own or are authorized to administer. You are responsible for using it lawfully and only on networks you have permission to scan.</p>
+    <h2>9. Responsible use</h2>
+    <p>NetSweep is designed for understanding and looking after networks that you own or are authorized to administer. The app requires you to acknowledge this before first use, and refuses targets outside your own network. You remain responsible for using it lawfully and only on networks you have permission to examine.</p>
 
-    <h2>9. Changes to this policy</h2>
+    <h2>10. Changes to this policy</h2>
     <p>If this policy changes, the updated version will be posted on this page with a revised "last updated" date. Material changes will be reflected here before they take effect.</p>
 
-    <h2>10. Contact</h2>
+    <h2>11. Contact</h2>
     <p>Questions about this policy or NetSweep's privacy practices can be directed to the developer:</p>
     <ul>
-      <li>Website: <a href="https://camgarrison.com" style="color:var(--accent);">camgarrison.com</a></li>
-      <li>GitHub: <a href="https://github.com/notchewy1324" style="color:var(--accent);">github.com/notchewy1324</a></li>
+      <li>Website: <a href="https://camgarrison.com">camgarrison.com</a></li>
+      <li>GitHub: <a href="https://github.com/notchewy1324">github.com/notchewy1324</a></li>
     </ul>
     <p style="margin-top:40px;"><a href="index.html" class="btn btn-ghost">← Back to NetSweep</a></p>
     </div>
@@ -115,21 +115,14 @@
   <div class="wrap foot-inner">
     <div>
       <a href="index.html" class="brand" style="margin-bottom:14px;">
-        <svg class="mark" viewBox="0 0 100 100" fill="none">
-          <defs>
-            <linearGradient id="swpf" x1="50" y1="50" x2="86" y2="22" gradientUnits="userSpaceOnUse">
-              <stop offset="0" stop-color="#5cd9db" stop-opacity="0.8"/>
-              <stop offset="1" stop-color="#5cd9db" stop-opacity="0"/>
-            </linearGradient>
-          </defs>
-          <circle cx="50" cy="50" r="40" stroke="#5cd9db" stroke-width="2" opacity="0.30"/>
-          <path d="M50 50 L50 8 A42 42 0 0 1 86 30 Z" fill="url(#swpf)"/>
-          <line x1="50" y1="50" x2="50" y2="8" stroke="#5cd9db" stroke-width="2.5" stroke-linecap="round"/>
-          <circle cx="50" cy="50" r="7" fill="#5cd9db"/>
+        <svg class="mark" viewBox="0 0 100 100" fill="none" aria-hidden="true">
+          <circle cx="50" cy="50" r="42" stroke="var(--accent)" stroke-width="2.5" opacity="0.3"/>
+          <path d="M14 50 H36 L43 34 L53 68 L60 50 H86" stroke="var(--accent)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="86" cy="50" r="5" fill="var(--accent)"/>
         </svg>
         NetSweep
       </a>
-      <p style="max-width:280px;font-size:0.9rem;">An on-device network observatory for the devices you own.</p>
+      <p style="max-width:280px;font-size:0.9rem;">Personal Wi-Fi diagnostics for the network you own.</p>
     </div>
     <div class="foot-links">
       <div class="foot-col">
@@ -147,15 +140,10 @@
   </div>
   <div class="wrap foot-bottom">
     <span>© <span id="year"></span> Cam Garrison. NetSweep.</span>
-    <span>For auditing networks you own or administer.</span>
+    <span>For your own network — by design.</span>
   </div>
 </footer>
 
 <script src="app.js"></script>
-<script>
-  // Set the "last updated" date to today in a readable format.
-  const u = document.getElementById('updated');
-  if (u) u.textContent = new Date().toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
-</script>
 </body>
 </html>

@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NetSweep — Use Cases for IT, Developers & Power Users</title>
-<meta name="description" content="How IT professionals, developers, and curious power users put NetSweep to work: home-lab audits, device inventory, port and TLS checks, CVE triage, and connection diagnostics — all on-device.">
+<title>NetSweep — Use Cases for Your Own Home Network</title>
+<meta name="description" content="How smart-home owners, developers, and home-lab tinkerers use NetSweep on their own networks: device inventory, service checks on their own gear, connection troubleshooting, and before-and-after scan comparison — all on-device.">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -12,19 +12,11 @@
 <nav>
   <div class="nav-inner">
     <a href="index.html" class="brand">
-      <svg class="mark" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <linearGradient id="swp" x1="50" y1="50" x2="86" y2="22" gradientUnits="userSpaceOnUse">
-            <stop offset="0" stop-color="#5cd9db" stop-opacity="0.85"/>
-            <stop offset="1" stop-color="#5cd9db" stop-opacity="0"/>
-          </linearGradient>
-        </defs>
-        <circle cx="50" cy="50" r="40" stroke="#5cd9db" stroke-width="2" opacity="0.30"/>
-        <circle cx="50" cy="50" r="26" stroke="#5cd9db" stroke-width="2" opacity="0.22"/>
-        <path d="M50 50 L50 8 A42 42 0 0 1 86 30 Z" fill="url(#swp)"/>
-        <line x1="50" y1="50" x2="50" y2="8" stroke="#5cd9db" stroke-width="2.5" stroke-linecap="round"/>
-        <circle cx="50" cy="50" r="7" fill="#5cd9db"/>
-        <circle cx="50" cy="50" r="3" fill="#eafdfd"/>
+      <svg class="mark" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <circle cx="50" cy="50" r="42" stroke="var(--accent)" stroke-width="2.5" opacity="0.3"/>
+        <circle cx="50" cy="50" r="28" stroke="var(--accent)" stroke-width="2" opacity="0.18"/>
+        <path d="M14 50 H36 L43 34 L53 68 L60 50 H86" stroke="var(--accent)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle class="pulse-core" cx="86" cy="50" r="5" fill="var(--accent)"/>
       </svg>
       NetSweep
     </a>
@@ -44,87 +36,86 @@
 
 <header class="hero wrap" style="padding-bottom:30px;">
   <span class="eyebrow reveal in" style="justify-content:center;">Use Cases</span>
-  <h1 class="reveal in" data-delay="80">Who reaches for<br><span class="gradient-text">NetSweep?</span></h1>
+  <h1 class="reveal in" data-delay="80">One network. Yours.<br><span class="gradient-text">A lot to understand.</span></h1>
   <p class="lead reveal in" data-delay="160" style="margin:0 auto;">
-    It's a scanner you'll actually open — because finding what's on your network
-    shouldn't require a laptop, a terminal, and a free afternoon. Here's how
-    different people put it to work.
+    NetSweep does one thing: it helps you understand and look after the network
+    you own. Here's how different people put it to work at home.
   </p>
 </header>
 
 <section class="wrap" style="padding-top:40px;">
 
-  <!-- IT PRO -->
+  <!-- SMART-HOME OWNERS -->
   <div class="usecase">
     <div class="reveal">
-      <span class="eyebrow">For IT &amp; sysadmins</span>
-      <h2>Walk into a site and know the network in 60 seconds.</h2>
-      <p class="lead">Pull out your phone, scan, and get an instant inventory — no laptop, no console cable, no VPN. Perfect for the first five minutes on an unfamiliar network or a quick spot-check of your own.</p>
+      <span class="eyebrow">For smart-home owners</span>
+      <h2>Finally know what's actually on your Wi-Fi.</h2>
+      <p class="lead">Smart plugs, cameras, doorbells, the TV, the printer, that one mystery device — see them all on a living map, in plain language. When something new joins your network, you'll know.</p>
       <ul class="uc-list">
-        <li>Inventory every responding device with hostname, vendor guess, and open ports</li>
-        <li>Spot the device that shouldn't be there — new arrivals are flagged on the map</li>
-        <li>Check the gateway, subnet, and what the connection looks like from outside</li>
-        <li>Hand off a clean PDF report for documentation or a ticket</li>
+        <li>A spatial map of every device on your home network, with hostname and vendor guess</li>
+        <li>"Devices worth a look" surfaces the handful that deserve attention — no alarm bells</li>
+        <li>Security Notes explain what a service is and why it matters, drawing on public NIST data</li>
+        <li>Optional alerts when a previously-unseen device joins your Wi-Fi</li>
       </ul>
     </div>
     <div class="uc-visual reveal" data-delay="120">
-      <div class="uc-tag">Scan summary</div>
+      <div class="uc-tag">Network Overview</div>
       <div class="mock">
-        <div class="row"><span class="k">Devices found</span><span class="v">14</span></div>
-        <div class="row"><span class="k">192.168.1.1 · gateway</span><span class="v">80, 443, 53</span></div>
-        <div class="row"><span class="k">192.168.1.42 · NAS</span><span class="v warn">22, 445, 5000</span></div>
-        <div class="row"><span class="k">192.168.1.88 · unknown</span><span class="v bad">NEW · 23 open</span></div>
-        <div class="row"><span class="k">Health score</span><span class="v warn">72 / B</span></div>
+        <div class="row"><span class="k">Devices on your network</span><span class="v">14</span></div>
+        <div class="row"><span class="k">To review</span><span class="v warn">2</span></div>
+        <div class="row"><span class="k">Smart TV · living room</span><span class="v ok">looks fine</span></div>
+        <div class="row"><span class="k">Old router · hallway</span><span class="v warn">worth a look — remote admin on</span></div>
+        <div class="row"><span class="k">Unknown device</span><span class="v warn">new — joined today</span></div>
       </div>
     </div>
   </div>
 
-  <!-- DEVELOPER -->
+  <!-- DEVELOPERS & HOME-LABBERS -->
   <div class="usecase">
     <div class="reveal">
-      <span class="eyebrow">For developers</span>
-      <h2>Is my dev server actually reachable — and only where it should be?</h2>
-      <p class="lead">Confirm that the service you just spun up is listening, check which ports are exposed on your machine or a Pi, and verify a TLS certificate without leaving your couch.</p>
+      <span class="eyebrow">For developers &amp; home-labbers</span>
+      <h2>Check your own gear from the couch.</h2>
+      <p class="lead">The Pi in the closet, the NAS under the desk, the dev server you just spun up — confirm what your own machines are serving, verify a local TLS certificate, and do subnet math without opening a laptop.</p>
       <ul class="uc-list">
-        <li>Targeted port scan against any host on your network</li>
-        <li>TLS inspection: certificate chain, expiry, and handshake timing</li>
-        <li>Banner grabs and service detection to confirm what's really running</li>
-        <li>DNS forward/reverse lookups and subnet math built in</li>
+        <li>Service Diagnostics against your own devices — what's listening, explained clearly</li>
+        <li>TLS inspection for services on your network: certificate chain, expiry, handshake timing</li>
+        <li>Bonjour discovery to see what your devices are advertising to the house</li>
+        <li>DNS lookups and subnet calculators built in with Net Utils</li>
       </ul>
     </div>
     <div class="uc-visual reveal" data-delay="120">
-      <div class="uc-tag">TLS inspection · api.local:443</div>
+      <div class="uc-tag">Service Diagnostics · nas.local</div>
       <div class="mock">
-        <div class="row"><span class="k">Handshake</span><span class="v ok">84 ms</span></div>
-        <div class="row"><span class="k">Issuer</span><span class="v">Let's Encrypt</span></div>
-        <div class="row"><span class="k">Expires in</span><span class="v warn">12 days</span></div>
-        <div class="row"><span class="k">Chain</span><span class="v ok">trusted</span></div>
-        <div class="row"><span class="k">Open ports</span><span class="v">22, 80, 443, 3000</span></div>
+        <div class="row"><span class="k">Scope</span><span class="v ok">✓ your network</span></div>
+        <div class="row"><span class="k">Web admin (443)</span><span class="v ok">responding · TLS trusted</span></div>
+        <div class="row"><span class="k">Certificate expires</span><span class="v warn">in 12 days</span></div>
+        <div class="row"><span class="k">File sharing (445)</span><span class="v">responding</span></div>
+        <div class="row"><span class="k">SSH (22)</span><span class="v dim">not responding</span></div>
       </div>
     </div>
   </div>
 
-  <!-- SECURITY-CURIOUS / HOME -->
+  <!-- THE HOUSEHOLD FIXER -->
   <div class="usecase">
     <div class="reveal">
-      <span class="eyebrow">For the security-curious</span>
-      <h2>Find out what's quietly living on your home network.</h2>
-      <p class="lead">Smart plugs, cameras, that one mystery device — see them all, learn what their open ports mean in plain language, and get pointed at real CVE data when something looks risky.</p>
+      <span class="eyebrow">For the household Wi-Fi fixer</span>
+      <h2>"The internet is slow" — now you can actually answer.</h2>
+      <p class="lead">When the connection feels off, get real numbers: latency, jitter, throughput, and what the internet sees from your side. Change a setting on the router, re-run, and compare scans to see exactly what it changed.</p>
       <ul class="uc-list">
-        <li>Plain-language risk notes for the services each device exposes</li>
-        <li>Live CVE lookup against the NIST National Vulnerability Database</li>
-        <li>Per-device breakdown showing exactly where the risk concentrates</li>
-        <li>Background checks that nudge you when a new device joins your Wi-Fi</li>
+        <li>Connection telemetry with history and trends, so you can tell a blip from a pattern</li>
+        <li>Compare any two scans — devices and services that appeared, vanished, or changed</li>
+        <li>Gateway and public-connection info in one place when you call your ISP</li>
+        <li>Exportable PDF / JSON reports for your own records</li>
       </ul>
     </div>
     <div class="uc-visual reveal" data-delay="120">
-      <div class="uc-tag">Vulnerability insights</div>
+      <div class="uc-tag">Compare · before / after router update</div>
       <div class="mock">
-        <div class="row"><span class="k">Devices with risk notes</span><span class="v warn">3</span></div>
-        <div class="row"><span class="k">IP camera · port 554</span><span class="v warn">RTSP exposed</span></div>
-        <div class="row"><span class="k">Old router · port 23</span><span class="v bad">Telnet — high risk</span></div>
-        <div class="row"><span class="k">NAS · port 445</span><span class="v warn">SMB — check shares</span></div>
-        <div class="row"><span class="k">CVE search</span><span class="v">NIST NVD · live</span></div>
+        <div class="row"><span class="k">Latency (median)</span><span class="v ok">31 ms → 18 ms</span></div>
+        <div class="row"><span class="k">Jitter</span><span class="v ok">improved</span></div>
+        <div class="row"><span class="k">Devices</span><span class="v">14 → 14</span></div>
+        <div class="row"><span class="k">Guest network</span><span class="v">newly visible</span></div>
+        <div class="row"><span class="k">Remote admin (router)</span><span class="v ok">no longer exposed</span></div>
       </div>
     </div>
   </div>
@@ -135,30 +126,39 @@
 <section class="wrap">
   <div class="sec-head center reveal">
     <span class="eyebrow" style="justify-content:center;">Honest by design</span>
-    <h2>What it does — and what iOS won't let any app do.</h2>
+    <h2>What it does, what it refuses, and what iOS won't allow.</h2>
   </div>
-  <div class="grid grid-2">
+  <div class="grid grid-3">
     <div class="card reveal">
       <h3 style="color:var(--good);">✓ What NetSweep does</h3>
       <ul class="uc-list" style="margin-top:14px;">
-        <li>TCP-connect scanning within iOS's sandbox — no private APIs</li>
-        <li>Bonjour / mDNS service discovery</li>
-        <li>TLS, DNS, banner, and CVE tooling</li>
-        <li>Connection quality estimates and history</li>
+        <li>Standard TCP-connect checks within iOS's sandbox — no private APIs</li>
+        <li>Bonjour / mDNS discovery of services your devices advertise</li>
+        <li>TLS, DNS, and connection-quality tooling for your own gear</li>
+        <li>Informational Security Notes backed by public NIST NVD data</li>
       </ul>
     </div>
-    <div class="card reveal" data-delay="100">
+    <div class="card reveal" data-delay="80">
+      <h3 style="color:var(--accent);">⊘ What it refuses, on purpose</h3>
+      <ul class="uc-list" style="margin-top:14px;">
+        <li>Any target outside your own subnet — refused at the engine level</li>
+        <li>Public IP addresses and internet hostnames as diagnostic targets</li>
+        <li>Running before you confirm the network is yours to look after</li>
+        <li>Exploit guidance of any kind — notes inform, they never instruct</li>
+      </ul>
+    </div>
+    <div class="card reveal" data-delay="160">
       <h3 style="color:var(--text-dim);">✕ What iOS restricts</h3>
       <ul class="uc-list" style="margin-top:14px;">
         <li>Reading other devices' MAC addresses (privacy-walled)</li>
         <li>Raw sockets, ICMP ping, or ARP sweeps</li>
         <li>Continuous background monitoring (only opportunistic checks)</li>
-        <li>Scanning a LAN over cellular — there isn't one</li>
+        <li>Local-network access over cellular — there's no LAN there</li>
       </ul>
     </div>
   </div>
   <div class="callout reveal" style="max-width:760px;margin:34px auto 0;">
-    <p>NetSweep is built for auditing networks you own or administer. It never claims capabilities iOS doesn't allow — every limitation is stated plainly in the app itself.</p>
+    <p>NetSweep is a diagnostic for the network you own or administer. The boundary is enforced in code, confirmed by you at first launch, and visible in the app every time you use it — and the app never claims a capability iOS doesn't allow.</p>
   </div>
 </section>
 
@@ -166,7 +166,7 @@
 <section class="wrap" style="text-align:center;">
   <div class="reveal">
     <h2>Built to be opened, not configured.</h2>
-    <p class="lead" style="margin:0 auto 28px;">No setup, no agents, no dashboards to maintain. Just scan and see.</p>
+    <p class="lead" style="margin:0 auto 28px;">No setup, no agents, no dashboards to maintain. Just open it on your own Wi-Fi and look around.</p>
     <div class="hero-actions">
       <a href="index.html" class="btn btn-primary">← Back to overview</a>
       <a href="privacy.html" class="btn btn-ghost">Read the privacy policy</a>
@@ -178,21 +178,14 @@
   <div class="wrap foot-inner">
     <div>
       <a href="index.html" class="brand" style="margin-bottom:14px;">
-        <svg class="mark" viewBox="0 0 100 100" fill="none">
-          <defs>
-            <linearGradient id="swpf" x1="50" y1="50" x2="86" y2="22" gradientUnits="userSpaceOnUse">
-              <stop offset="0" stop-color="#5cd9db" stop-opacity="0.8"/>
-              <stop offset="1" stop-color="#5cd9db" stop-opacity="0"/>
-            </linearGradient>
-          </defs>
-          <circle cx="50" cy="50" r="40" stroke="#5cd9db" stroke-width="2" opacity="0.30"/>
-          <path d="M50 50 L50 8 A42 42 0 0 1 86 30 Z" fill="url(#swpf)"/>
-          <line x1="50" y1="50" x2="50" y2="8" stroke="#5cd9db" stroke-width="2.5" stroke-linecap="round"/>
-          <circle cx="50" cy="50" r="7" fill="#5cd9db"/>
+        <svg class="mark" viewBox="0 0 100 100" fill="none" aria-hidden="true">
+          <circle cx="50" cy="50" r="42" stroke="var(--accent)" stroke-width="2.5" opacity="0.3"/>
+          <path d="M14 50 H36 L43 34 L53 68 L60 50 H86" stroke="var(--accent)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="86" cy="50" r="5" fill="var(--accent)"/>
         </svg>
         NetSweep
       </a>
-      <p style="max-width:280px;font-size:0.9rem;">An on-device network observatory for the devices you own.</p>
+      <p style="max-width:280px;font-size:0.9rem;">Personal Wi-Fi diagnostics for the network you own.</p>
     </div>
     <div class="foot-links">
       <div class="foot-col">
@@ -210,7 +203,7 @@
   </div>
   <div class="wrap foot-bottom">
     <span>© <span id="year"></span> Cam Garrison. NetSweep.</span>
-    <span>For auditing networks you own or administer.</span>
+    <span>For your own network — by design.</span>
   </div>
 </footer>
 
